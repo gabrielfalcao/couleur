@@ -30,7 +30,6 @@ couleur has a syntax sugar that is semantically nice:
 
 # Licensing
 
-> Copyright (c) 2009 Gabriel Falcão
-> Dual licensed under the MIT and GPL 3+ licenses.
-> http://www.opensource.org/licenses/mit-license.php
-> http://www.gnu.org/copyleft/gpl.html
+    Copyright (c) 2010 Gabriel Falcão
+    Licensed under LGPL 3+
+    http://www.gnu.org/copyleft/gpl.html
