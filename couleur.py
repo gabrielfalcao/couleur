@@ -17,36 +17,6 @@
 
 import sys
 
-# [0m  -> reset
-# [1m  -> bold on
-# [3m  -> italics on
-# [4m  -> underline on
-# [7m  -> inverse on
-# [9m  -> strikethrough on
-# [22m -> bold off
-# [23m -> italics off
-# [24m -> underline off
-# [27m -> inverse off
-# [29m -> strikethrough off
-# [30m -> fore color black
-# [31m -> fore color red
-# [32m -> fore color green
-# [33m -> fore color yellow
-# [34m -> fore color blue
-# [35m -> fore color magenta
-# [36m -> fore color cyan
-# [37m -> fore color white
-# [39m -> fore color default
-# [40m -> back color black
-# [41m -> back color red
-# [42m -> back color green
-# [43m -> back color yellow
-# [44m -> back color blue
-# [45m -> back color magenta
-# [46m -> back color cyan
-# [47m -> back color white
-# [49m -> back color default
-
 def ansify(number):
     """Wraps the given ansi code to a proper escaped python output
 
@@ -56,13 +26,49 @@ def ansify(number):
     number = unicode(number)
     return '\033[%sm' % number
 
+class modifiers:
+    reset = ansify(0)
+    bold = ansify(1)
+    italic = ansify(3)
+    underline = ansify(4)
+    inverse = ansify(7)
+    strikethrough = ansify(9)
+
+    class off:
+        bold = ansify(22)
+        italic = ansify(23)
+        underline = ansify(24)
+        inverse = ansify(27)
+        strikethrough = ansify(29)
+
+class forecolors:
+    black = ansify(30)
+    red = ansify(31)
+    green = ansify(32)
+    yellow = ansify(33)
+    blue = ansify(34)
+    magenta = ansify(35)
+    cyan = ansify(36)
+    white = ansify(37)
+    default = ansify(39)
+
+class backcolors:
+    black = ansify(40)
+    red = ansify(41)
+    green = ansify(42)
+    yellow = ansify(43)
+    blue = ansify(44)
+    magenta = ansify(45)
+    cyan = ansify(46)
+    white = ansify(47)
+    default = ansify(49)
+
 class Shell(object):
     def black(self, string):
-        sys.stdout.write(ansify(30) + string + ansify(0))
+        sys.stdout.write(forecolors.black + string + modifiers.reset)
 
     def black_on_white(self, string):
-        sys.stdout.write(ansify(47) + ansify(30) + string + ansify(0))
+        sys.stdout.write(backcolors.white + forecolors.black + string + modifiers.reset)
 
     def green(self, string):
-        sys.stdout.write(ansify(32) + string + ansify(0))
-
+        sys.stdout.write(forecolors.green + string + modifiers.reset)
