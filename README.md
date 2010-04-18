@@ -4,7 +4,13 @@ __Version 0.1__
 __Couleur__ is a handy tool to play around with ANSI features in a
 unix terminal
 
-## Nutshell
+## features
+
++ Single python file
++ 100% tested
++ comes with syntax sugar
+
+## nutshell
 
 couleur has a syntax sugar that is semantically nice:
 
@@ -27,11 +33,24 @@ couleur has a syntax sugar that is semantically nice:
     sh.green_and_nornal_and_blue('this will be printed in green| and |this in blue')
     # see: '\033[32mthis will be printed in green\033[0m and \033[34mthis in blue\033[0m'
 
-# Nomenclature:
+## free software
+
+To contribute back with this project, all you need to do is write code, and test code that proofs its functionallity
+
+### cloning and running tests
+
+You will need to install [nose](http://somethingaboutorange.com/mrl/projects/nose/0.11.3/ "a pretty way for testing in python").
+
+And run:
+    user@machine:~/Projects$ git clone git://github.com/gabrielfalcao/couleur.git
+    user@machine:~/Projects$ cd couleur
+    user@machine:~/Projects/couleur$ nosetests
+
+## nomenclature
 
   "couleur" stands for "color" in French, I like french, hence the name
 
-# Licensing
+## Licensing
 
     Copyright (c) 2010 Gabriel Falcão
     Licensed under LGPL 3+
