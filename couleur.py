@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import uuid
 
 def ansify(number):
     """Wraps the given ansi code to a proper escaped python output
@@ -63,12 +64,44 @@ class backcolors:
     white = ansify(47)
     default = ansify(49)
 
+def fore(color):
+    return getattr(forecolors, color)
+
+def back(color):
+    return getattr(backcolors, color)
+
+_sep1 = '_on_'
+_sep2 = '_and_'
+
+def _printer_for(color):
+    colors = color.split(_sep1)
+
+    parts = [
+        fore(colors.pop(0)),
+        "%s",
+        modifiers.reset
+    ]
+
+    if colors:
+        parts.insert(0, back(colors[0]))
+
+    string = "".join(parts)
+    return lambda z: sys.stdout.write(string % z)
+
 class Shell(object):
-    def black(self, string):
-        sys.stdout.write(forecolors.black + string + modifiers.reset)
+    def __getattr__(self, attr):
+        if _sep2 in attr:
+            printers = map(_printer_for, attr.split(_sep2))
+            def dec(string):
+                unique = str(uuid.uuid4())
+                string = string.replace(r'\|', unique)
+                parts = string.split("|")
 
-    def black_on_white(self, string):
-        sys.stdout.write(backcolors.white + forecolors.black + string + modifiers.reset)
+                for part, output in zip(parts, printers):
+                    output(part.replace(unique, "|"))
+            return dec
 
-    def green(self, string):
-        sys.stdout.write(forecolors.green + string + modifiers.reset)
+        try:
+            return _printer_for(attr)
+        except AttributeError:
+            return super(Shell, self).__getattribute__(attr)

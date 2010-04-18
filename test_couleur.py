@@ -58,7 +58,8 @@ def test_output_green_foreground():
     assert_stdout('\033[32mHello World!\033[0m')
 
 @with_setup(prepare_stdout)
-def _test_mixed_output():
+def test_mixed_output():
+    "Test mixed output"
     sh = Shell()
     sh.green_and_red_and_white("Hello |World |for you!")
     assert_stdout(
@@ -66,15 +67,16 @@ def _test_mixed_output():
     )
 
 @with_setup(prepare_stdout)
-def _test_mixed_output_with_escaped_separator():
+def test_mixed_output_with_escaped_separator():
     sh = Shell()
     sh.green_and_red_on_yellow("Hello |World \|for you!")
     assert_stdout(
-        '\033[32mHello \033[0m\033[43m\033[31mWorld for you!\033[0m'
+        '\033[32mHello \033[0m\033[43m\033[31mWorld |for you!\033[0m'
     )
 
 @with_setup(prepare_stdout)
-def _test_mixed_output_with_backgrounds():
+def test_mixed_output_with_backgrounds():
+    "test mixed output with nice background"
     sh = Shell()
     sh.green_on_magenta_and_red_and_white_on_blue("Hello |World |for you!")
     assert_stdout('\033[45m\033[32mHello \033[0m\033[31mWorld \033[0m\033[44m\033[37mfor you!\033[0m'
