@@ -1,0 +1,32 @@
+# couleur - colored terminal tool for python
+> Version 0.1
+
+## Handy
+
+   >>> import couleur
+   >>> sh = couleur.Shell(indent=4)
+   >>>
+   >>> sh.bold_black_on_white('Nice highlight')
+   '\033[1m\033[47m\033[30mNice highlight\033[0m'
+   >>>
+   >>> sh.indent()
+   >>>
+   >>> sh.green('Just green')
+   '    \033[32mJust Green\033[0m'
+   >>>
+   >>> sh.dedent()
+   >>> sh.green_and_nornal_and_blue(
+   ...     'this will be printed in green| and |this in blue'
+   ... )
+   '\033[32mthis will be printed in green\033[0m and \033[34mthis in blue\033[0m'
+
+# Nomenclature:
+
+  "couleur" stands for "color" in French, I like french, hence the name
+
+# Licensing
+
+> Copyright (c) 2009 Gabriel Falcão
+> Dual licensed under the MIT and GPL 3+ licenses.
+> http://www.opensource.org/licenses/mit-license.php
+> http://www.gnu.org/copyleft/gpl.html
