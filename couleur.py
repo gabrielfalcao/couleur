@@ -132,7 +132,7 @@ class Shell(object):
 
 
     def __getattr__(self, attr):
-        if attr.startswith("print_"):
+        if not attr.startswith("_"):
             if _sep2 in attr:
                 self._in_format = True
                 printers = map(self._printer_for, attr.split(_sep2))
