@@ -47,10 +47,10 @@ couleur can overwrite output, so that you can make things like printing progress
         if num == 0:
             print
 
-        shell.print_bold_white_on_red("Downloading file: %d%%" % num)
-        time.sleep(0.2)
+        shell.print_bold_white_on_red("Downloading file: %d%%" % num, replace=True)
+        time.sleep(0.05)
 
-    shell.print_bold_white_on_green("Downloading file: DONE!")
+    shell.print_bold_white_on_green("Downloading file: DONE!", replace=True)
 
 ## free software
 
