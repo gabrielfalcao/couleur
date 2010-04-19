@@ -17,20 +17,20 @@ couleur has a syntax sugar that is semantically nice:
     import couleur
     sh = couleur.Shell(indent=4)
 
-    sh.print_bold_black_on_white('Nice highlight')
+    sh.bold_black_on_white('Nice highlight')
     # prints '\033[47m\033[1m\033[30mNice highlight\033[0m'
 
     sh.indent()
     # will increase a internal indentation factor in couleur.Shell instance
 
-    sh.print_green('Just green')
+    sh.green('Just green')
     # prints indented as well '    \033[32mJust Green\033[0m'
 
     sh.dedent()
     # will decrease that indentation factor (above)
 
     # syntax sugar
-    sh.print_green_and_nornal_and_blue('this will be printed in green| and |this in blue')
+    sh.green_and_nornal_and_blue('this will be printed in green| and |this in blue')
     # see: '\033[32mthis will be printed in green\033[0m and \033[34mthis in blue\033[0m'
 
 couleur can overwrite output, so that you can make things like printing progress bars, show percentage and so on:
@@ -47,10 +47,10 @@ couleur can overwrite output, so that you can make things like printing progress
         if num == 0:
             print
 
-        shell.print_yellow_and_red("Downloading file: |%d%%" % num, replace=True)
+        shell.yellow_and_red("Downloading file: |%d%%" % num, replace=True)
         time.sleep(0.05)
 
-    shell.print_white_and_green("Downloading file: |DONE!", replace=True)
+    shell.white_and_green("Downloading file: |DONE!", replace=True)
 
 ### furthermore
 

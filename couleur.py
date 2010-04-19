@@ -100,7 +100,6 @@ class Shell(object):
         self._indent -= self._indentation_factor
 
     def _printer_for(self, color):
-        color = color.replace('print_', '')
         colors = color.split(_sep1)
 
         parts = [
