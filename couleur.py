@@ -36,6 +36,7 @@ class modifiers:
     underline = ansify(4)
     inverse = ansify(7)
     strikethrough = ansify(9)
+    up = '\r\033[A'
 
     class off:
         bold = ansify(22)
@@ -119,7 +120,7 @@ class Shell(object):
             parts.append("\n")
 
         string = "".join(parts)
-        return lambda z: sys.stdout.write(string % z)
+        return lambda z, replace=False: sys.stdout.write((replace and modifiers.up or '') + string % z)
 
 
     def __getattr__(self, attr):

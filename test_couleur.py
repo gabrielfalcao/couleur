@@ -118,3 +118,11 @@ def test_bold_inline():
     sh.print_bold_normal_on_red("World")
     assert_stdout('\033[44m\033[1m\033[39mHello\033[0m\033[41m\033[1m\033[39mWorld\033[0m')
 
+@with_setup(prepare_stdout)
+def test_update_shell():
+    "updating the shell, replacing the last output"
+    sh = Shell(indent=6)
+    sh.print_yellow("Yellow")
+    sh.indent()
+    sh.print_red("Red", True)
+    assert_stdout('\033[33mYellow\033[0m\r\033[A      \033[31mRed\033[0m')
