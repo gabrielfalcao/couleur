@@ -33,6 +33,22 @@ couleur has a syntax sugar that is semantically nice:
     sh.print_green_and_nornal_and_blue('this will be printed in green| and |this in blue')
     # see: '\033[32mthis will be printed in green\033[0m and \033[34mthis in blue\033[0m'
 
+couleur can overwrite output, so that you can make things like printing progress bars, show percentage and so on:
+
+    #!/usr/bin/env python
+    # -*- coding: utf-8 -*-
+
+    import time
+    import couleur
+
+    shell = couleur.Shell()
+
+    for num in range(101):
+        shell.print_bold_white_on_red("Downloading file: %d%%" % num)
+        time.sleep(0.2)
+
+    shell.print_bold_white_on_green("Downloading file: DONE!")
+
 ## free software
 
 To contribute back with this project, all you need to do is write code, and test code that proofs its functionallity
