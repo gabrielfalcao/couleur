@@ -18,6 +18,8 @@
 import sys
 import uuid
 
+__version__ = '0.1'
+
 def ansify(number):
     """Wraps the given ansi code to a proper escaped python output
 
@@ -51,7 +53,7 @@ class forecolors:
     magenta = ansify(35)
     cyan = ansify(36)
     white = ansify(37)
-    default = ansify(39)
+    normal = ansify(39)
 
 class backcolors:
     black = ansify(40)
@@ -62,10 +64,18 @@ class backcolors:
     magenta = ansify(45)
     cyan = ansify(46)
     white = ansify(47)
-    default = ansify(49)
+    normal = ansify(49)
 
 def fore(color):
-    return getattr(forecolors, color)
+    def get(what):
+        try:
+            r = getattr(modifiers, what)
+        except AttributeError:
+            r = getattr(forecolors, what)
+        return r
+
+    args = map(get, color.split("_"))
+    return "".join(args)
 
 def back(color):
     return getattr(backcolors, color)
@@ -73,35 +83,59 @@ def back(color):
 _sep1 = '_on_'
 _sep2 = '_and_'
 
-def _printer_for(color):
-    colors = color.split(_sep1)
-
-    parts = [
-        fore(colors.pop(0)),
-        "%s",
-        modifiers.reset
-    ]
-
-    if colors:
-        parts.insert(0, back(colors[0]))
-
-    string = "".join(parts)
-    return lambda z: sys.stdout.write(string % z)
-
 class Shell(object):
+    def __init__(self, indent=2, breakline=False, bold=False):
+        self._indentation_factor = indent
+        self._indent = 0
+        self._breakline = breakline
+        self._bold = bold
+
+    def indent(self):
+        self._indent += self._indentation_factor
+
+    def dedent(self):
+        self._indent -= self._indentation_factor
+
+    def _printer_for(self, color):
+        color = color.replace('print_', '')
+        colors = color.split(_sep1)
+
+        parts = [
+            fore(colors.pop(0)),
+            "%s",
+            modifiers.reset
+        ]
+
+        if colors:
+            parts.insert(0, back(colors[0]))
+
+        if self._bold:
+            parts.insert(0, ansify(1))
+
+        if self._indent:
+            parts.insert(0, ' ' * self._indent)
+
+        if self._breakline:
+            parts.append("\n")
+
+        string = "".join(parts)
+        return lambda z: sys.stdout.write(string % z)
+
+
     def __getattr__(self, attr):
-        if _sep2 in attr:
-            printers = map(_printer_for, attr.split(_sep2))
-            def dec(string):
-                unique = str(uuid.uuid4())
-                string = string.replace(r'\|', unique)
-                parts = string.split("|")
+        if attr.startswith("print_"):
+            if _sep2 in attr:
+                printers = map(self._printer_for, attr.split(_sep2))
+                def dec(string):
+                    unique = str(uuid.uuid4())
+                    string = string.replace(r'\|', unique)
+                    parts = string.split("|")
 
-                for part, output in zip(parts, printers):
-                    output(part.replace(unique, "|"))
-            return dec
+                    for part, output in zip(parts, printers):
+                        output(part.replace(unique, "|"))
 
-        try:
-            return _printer_for(attr)
-        except AttributeError:
-            return super(Shell, self).__getattribute__(attr)
+                return dec
+
+            return self._printer_for(attr)
+
+        return super(Shell, self).__getattribute__(attr)

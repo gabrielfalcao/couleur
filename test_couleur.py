@@ -40,44 +40,81 @@ def test_ansify():
 def test_output_black_foreground():
     "Test output: black foreground"
     sh = Shell()
-    sh.black("Hello Black!")
+    sh.print_black("Hello Black!")
     assert_stdout('\033[30mHello Black!\033[0m')
 
 @with_setup(prepare_stdout)
 def test_output_black_foreground_on_white_background():
     "Test output: black foreground on white background"
     sh = Shell()
-    sh.black_on_white("Hello Black!")
+    sh.print_black_on_white("Hello Black!")
     assert_stdout('\033[47m\033[30mHello Black!\033[0m')
 
 @with_setup(prepare_stdout)
 def test_output_green_foreground():
     "Test output: green foreground"
     sh = Shell()
-    sh.green("Hello World!")
+    sh.print_green("Hello World!")
     assert_stdout('\033[32mHello World!\033[0m')
 
 @with_setup(prepare_stdout)
 def test_mixed_output():
-    "Test mixed output"
+    "print_green_and_red_and_white is a valid call"
     sh = Shell()
-    sh.green_and_red_and_white("Hello |World |for you!")
+    sh.print_green_and_red_and_white("Hello |World |for you!")
     assert_stdout(
         '\033[32mHello \033[0m\033[31mWorld \033[0m\033[37mfor you!\033[0m'
     )
 
 @with_setup(prepare_stdout)
 def test_mixed_output_with_escaped_separator():
+    "print_green_and_red_on_yellow works is a valid call"
     sh = Shell()
-    sh.green_and_red_on_yellow("Hello |World \|for you!")
+    sh.print_green_and_red_on_yellow("Hello |World \|for you!")
     assert_stdout(
         '\033[32mHello \033[0m\033[43m\033[31mWorld |for you!\033[0m'
     )
 
 @with_setup(prepare_stdout)
 def test_mixed_output_with_backgrounds():
-    "test mixed output with nice background"
+    "print_green_on_magenta_and_red_and_white_on_blue is a valid call"
     sh = Shell()
-    sh.green_on_magenta_and_red_and_white_on_blue("Hello |World |for you!")
+    sh.print_green_on_magenta_and_red_and_white_on_blue("Hello |World |for you!")
     assert_stdout('\033[45m\033[32mHello \033[0m\033[31mWorld \033[0m\033[44m\033[37mfor you!\033[0m'
     )
+
+@with_setup(prepare_stdout)
+def test_indent():
+    "indentation"
+    sh = Shell(indent=4, breakline=True)
+    sh.print_normal_on_blue("Hello")
+    sh.indent()
+    sh.print_normal_on_red("World")
+    assert_stdout('\033[44m\033[39mHello\033[0m\n    \033[41m\033[39mWorld\033[0m\n')
+
+@with_setup(prepare_stdout)
+def test_dedent():
+    "de-indentation"
+    sh = Shell(indent=4, breakline=True)
+    sh.indent()
+    sh.print_normal_on_blue("Hello")
+    sh.dedent()
+    sh.print_normal_on_red("World")
+    assert_stdout('    \033[44m\033[39mHello\033[0m\n\033[41m\033[39mWorld\033[0m\n')
+
+@with_setup(prepare_stdout)
+def test_bold():
+    "bold text"
+    sh = Shell(bold=True)
+    sh.print_normal_on_blue("Hello")
+    sh.print_normal_on_red("World")
+    assert_stdout('\033[1m\033[44m\033[39mHello\033[0m\033[1m\033[41m\033[39mWorld\033[0m')
+
+@with_setup(prepare_stdout)
+def test_bold_inline():
+    "bold text with inline call"
+    sh = Shell()
+    sh.print_bold_normal_on_blue("Hello")
+    sh.print_bold_normal_on_red("World")
+    assert_stdout('\033[44m\033[1m\033[39mHello\033[0m\033[41m\033[1m\033[39mWorld\033[0m')
+
