@@ -91,6 +91,7 @@ class Shell(object):
         self._indent = 0
         self._breakline = breakline
         self._bold = bold
+        self._in_format = False
 
     def indent(self):
         self._indent += self._indentation_factor
@@ -111,30 +112,50 @@ class Shell(object):
         if colors:
             parts.insert(0, back(colors[0]))
 
-        if self._bold:
-            parts.insert(0, ansify(1))
+        if not self._in_format:
+            if self._bold:
+                parts.insert(0, ansify(1))
 
-        if self._indent:
-            parts.insert(0, ' ' * self._indent)
+            if self._indent:
+                parts.insert(0, ' ' * self._indent)
 
-        if self._breakline:
-            parts.append("\n")
+            if self._breakline:
+                parts.append("\n")
 
         string = "".join(parts)
-        return lambda z, replace=False: sys.stdout.write((replace and modifiers.up or '') + string % z)
+
+        def dec(z, replace=False):
+            pre = (replace and modifiers.up or '')
+            sys.stdout.write(pre + (string % z))
+
+        return dec
 
 
     def __getattr__(self, attr):
         if attr.startswith("print_"):
             if _sep2 in attr:
+                self._in_format = True
                 printers = map(self._printer_for, attr.split(_sep2))
-                def dec(string):
+                def dec(string, replace=False):
                     unique = str(uuid.uuid4())
                     string = string.replace(r'\|', unique)
                     parts = string.split("|")
+                    if replace:
+                        sys.stdout.write(modifiers.up)
+
+                    if self._indent:
+                        sys.stdout.write(' ' * self._indent)
+
+                    if self._bold:
+                        sys.stdout.write(ansify(1))
 
                     for part, output in zip(parts, printers):
                         output(part.replace(unique, "|"))
+
+                    if self._breakline:
+                        sys.stdout.write("\n")
+
+                    self._in_format = False
 
                 return dec
 

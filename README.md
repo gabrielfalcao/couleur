@@ -41,16 +41,16 @@ couleur can overwrite output, so that you can make things like printing progress
     import time
     import couleur
 
-    shell = couleur.Shell(breakline=True)
+    shell = couleur.Shell(breakline=True, bold=True)
 
     for num in range(101):
         if num == 0:
             print
 
-        shell.print_bold_white_on_red("Downloading file: %d%%" % num, replace=True)
+        shell.print_yellow_and_red("Downloading file: |%d%%" % num, replace=True)
         time.sleep(0.05)
 
-    shell.print_bold_white_on_green("Downloading file: DONE!", replace=True)
+    shell.print_white_and_green("Downloading file: |DONE!", replace=True)
 
 ## free software
 

@@ -126,3 +126,32 @@ def test_update_shell():
     sh.indent()
     sh.print_red("Red", True)
     assert_stdout('\033[33mYellow\033[0m\r\033[A      \033[31mRed\033[0m')
+
+@with_setup(prepare_stdout)
+def test_update_shell_mixed_with_linebreak():
+    "updating the shell with mixed output and breakline enabled"
+    sh = Shell(breakline=True)
+    sh.print_yellow("Yellow")
+    sh.print_yellow_and_normal_and_red("Yellow| and |Red", True)
+    sh.print_green("Green")
+    assert_stdout('\033[33mYellow\033[0m\n\r\033[A\033[33mYellow\033[0m\033[39m and \033[0m\033[31mRed\033[0m\n\033[32mGreen\033[0m\n')
+
+@with_setup(prepare_stdout)
+def test_update_shell_mixed_with_indentation():
+    "updating the shell with mixed output and indentation"
+    sh = Shell(breakline=True)
+    sh.print_yellow("Yellow")
+    sh.indent()
+    sh.print_yellow_and_normal_and_red("Yellow| and |Red", True)
+    sh.dedent()
+    sh.print_green("Green")
+    assert_stdout('\033[33mYellow\033[0m\n\r\033[A  \033[33mYellow\033[0m\033[39m and \033[0m\033[31mRed\033[0m\n\033[32mGreen\033[0m\n')
+
+@with_setup(prepare_stdout)
+def test_update_shell_mixed_with_bold():
+    "updating the shell with mixed output and bold enabled"
+    sh = Shell(bold=True)
+    sh.print_yellow("Yellow")
+    sh.print_yellow_and_normal_and_red("Yellow| and |Red", True)
+    sh.print_green("Green")
+    assert_stdout('\033[1m\033[33mYellow\033[0m\r\033[A\033[1m\033[33mYellow\033[0m\033[39m and \033[0m\033[31mRed\033[0m\033[1m\033[32mGreen\033[0m')
