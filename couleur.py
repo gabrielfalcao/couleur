@@ -86,10 +86,10 @@ _sep1 = '_on_'
 _sep2 = '_and_'
 
 class Shell(object):
-    def __init__(self, indent=2, breakline=False, bold=False):
+    def __init__(self, indent=2, linebreak=False, bold=False):
         self._indentation_factor = indent
         self._indent = 0
-        self._breakline = breakline
+        self._linebreak = linebreak
         self._bold = bold
         self._in_format = False
 
@@ -118,7 +118,7 @@ class Shell(object):
             if self._indent:
                 parts.insert(0, ' ' * self._indent)
 
-            if self._breakline:
+            if self._linebreak:
                 parts.append("\n")
 
         string = "".join(parts)
@@ -151,7 +151,7 @@ class Shell(object):
                     for part, output in zip(parts, printers):
                         output(part.replace(unique, "|"))
 
-                    if self._breakline:
+                    if self._linebreak:
                         sys.stdout.write("\n")
 
                     self._in_format = False

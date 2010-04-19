@@ -41,7 +41,7 @@ couleur can overwrite output, so that you can make things like printing progress
     import time
     import couleur
 
-    shell = couleur.Shell(breakline=True, bold=True)
+    shell = couleur.Shell(linebreak=True, bold=True)
 
     for num in range(101):
         if num == 0:
@@ -86,7 +86,7 @@ Example chaining modifiers:
 
     import couleur
 
-    shell = couleur.Shell(breakline=True)
+    shell = couleur.Shell(linebreak=True)
     shell.bold_italic_underline_yellow_on_black_and_italic_black_on_white("WOO| HOO")
 
 ## free software

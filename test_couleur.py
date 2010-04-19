@@ -86,7 +86,7 @@ def test_mixed_output_with_backgrounds():
 @with_setup(prepare_stdout)
 def test_indent():
     "indentation"
-    sh = Shell(indent=4, breakline=True)
+    sh = Shell(indent=4, linebreak=True)
     sh.normal_on_blue("Hello")
     sh.indent()
     sh.normal_on_red("World")
@@ -95,7 +95,7 @@ def test_indent():
 @with_setup(prepare_stdout)
 def test_dedent():
     "de-indentation"
-    sh = Shell(indent=4, breakline=True)
+    sh = Shell(indent=4, linebreak=True)
     sh.indent()
     sh.normal_on_blue("Hello")
     sh.dedent()
@@ -129,8 +129,8 @@ def test_update_shell():
 
 @with_setup(prepare_stdout)
 def test_update_shell_mixed_with_linebreak():
-    "updating the shell with mixed output and breakline enabled"
-    sh = Shell(breakline=True)
+    "updating the shell with mixed output and linebreak enabled"
+    sh = Shell(linebreak=True)
     sh.yellow("Yellow")
     sh.yellow_and_normal_and_red("Yellow| and |Red", True)
     sh.green("Green")
@@ -139,7 +139,7 @@ def test_update_shell_mixed_with_linebreak():
 @with_setup(prepare_stdout)
 def test_update_shell_mixed_with_indentation():
     "updating the shell with mixed output and indentation"
-    sh = Shell(breakline=True)
+    sh = Shell(linebreak=True)
     sh.yellow("Yellow")
     sh.indent()
     sh.yellow_and_normal_and_red("Yellow| and |Red", True)
