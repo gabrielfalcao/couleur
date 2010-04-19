@@ -41,9 +41,12 @@ couleur can overwrite output, so that you can make things like printing progress
     import time
     import couleur
 
-    shell = couleur.Shell()
+    shell = couleur.Shell(breakline=True)
 
     for num in range(101):
+        if num == 0:
+            print
+
         shell.print_bold_white_on_red("Downloading file: %d%%" % num)
         time.sleep(0.2)
 
