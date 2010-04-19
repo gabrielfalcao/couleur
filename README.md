@@ -52,6 +52,43 @@ couleur can overwrite output, so that you can make things like printing progress
 
     shell.print_white_and_green("Downloading file: |DONE!", replace=True)
 
+### furthermore
+
+With couleur you can mix modifiers and colors.
+
+Available modifiers:
+
++ reset - resets from the current point to the end
++ bold - make text bold
++ blink - it may blink the text or make it slighly lighten, depending on the terminal
++ italic - make text italic
++ underline - add underline on text
++ inverse - invert colors
++ strikethrough - draws a line through the text
++ up - does the same than passing replace=True to the output function: carriage return and one line up
+
+Available colors:
+
++ normal
++ black
++ red
++ green
++ yellow
++ blue
++ magenta
++ cyan
++ white
+
+Example chaining modifiers:
+
+    #!/usr/bin/env python
+    # -*- coding: utf-8 -*-
+
+    import couleur
+
+    shell = couleur.Shell(breakline=True)
+    shell.bold_italic_underline_yellow_on_black_and_italic_black_on_white("WOO| HOO")
+
 ## free software
 
 To contribute back with this project, all you need to do is write code, and test code that proofs its functionallity
