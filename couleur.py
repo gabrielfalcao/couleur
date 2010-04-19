@@ -32,6 +32,7 @@ def ansify(number):
 class modifiers:
     reset = ansify(0)
     bold = ansify(1)
+    blink = ansify(2)
     italic = ansify(3)
     underline = ansify(4)
     inverse = ansify(7)
