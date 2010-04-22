@@ -18,7 +18,7 @@
 import sys
 import uuid
 
-__version__ = '0.1'
+__version__ = '0.2'
 
 def ansify(number):
     """Wraps the given ansi code to a proper escaped python output
@@ -32,19 +32,12 @@ def ansify(number):
 class modifiers:
     reset = ansify(0)
     bold = ansify(1)
-    blink = ansify(2)
+    blink = ansify(5)
     italic = ansify(3)
     underline = ansify(4)
     inverse = ansify(7)
     strikethrough = ansify(9)
     up = '\r\033[A'
-
-    class off:
-        bold = ansify(22)
-        italic = ansify(23)
-        underline = ansify(24)
-        inverse = ansify(27)
-        strikethrough = ansify(29)
 
 class forecolors:
     black = ansify(30)
@@ -68,30 +61,31 @@ class backcolors:
     white = ansify(47)
     normal = ansify(49)
 
-def fore(color):
-    def get(what):
-        try:
-            r = getattr(modifiers, what)
-        except AttributeError:
-            r = getattr(forecolors, what)
-        return r
-
-    args = map(get, color.split("_"))
-    return "".join(args)
-
-def back(color):
-    return getattr(backcolors, color)
+class empty(object):
+    def __getattr__(self, attr):
+        if attr != 'up':
+            return ''
+        else:
+            return modifiers.up
 
 _sep1 = '_on_'
 _sep2 = '_and_'
 
 class Shell(object):
-    def __init__(self, indent=2, linebreak=False, bold=False):
+    def __init__(self, indent=2, linebreak=False, bold=False, disabled=False):
         self._indentation_factor = indent
         self._indent = 0
         self._linebreak = linebreak
         self._bold = bold
         self._in_format = False
+        self._disabled = disabled
+        self._backcolors = backcolors()
+        self._forecolors = forecolors()
+        self._modifiers = modifiers()
+        if disabled:
+            self._backcolors = empty()
+            self._forecolors = empty()
+            self._modifiers = empty()
 
     def indent(self):
         self._indent += self._indentation_factor
@@ -99,21 +93,36 @@ class Shell(object):
     def dedent(self):
         self._indent -= self._indentation_factor
 
+
+    def _fore(self, color):
+        def get(what):
+            try:
+                r = getattr(self._modifiers, what)
+            except AttributeError:
+                r = getattr(self._forecolors, what)
+            return r
+
+        args = map(get, color.split("_"))
+        return "".join(args)
+
+    def _back(self, color):
+        return getattr(self._backcolors, color)
+
     def _printer_for(self, color):
         colors = color.split(_sep1)
 
         parts = [
-            fore(colors.pop(0)),
+            self._fore(colors.pop(0)),
             "%s",
-            modifiers.reset
+            self._modifiers.reset
         ]
 
         if colors:
-            parts.insert(0, back(colors[0]))
+            parts.insert(0, self._back(colors[0]))
 
         if not self._in_format:
             if self._bold:
-                parts.insert(0, ansify(1))
+                parts.insert(0, self._modifiers.bold)
 
             if self._indent:
                 parts.insert(0, ' ' * self._indent)
@@ -124,7 +133,7 @@ class Shell(object):
         string = "".join(parts)
 
         def dec(z, replace=False):
-            pre = (replace and modifiers.up or '')
+            pre = (replace and self._modifiers.up or '')
             sys.stdout.write(pre + (string % z))
 
         return dec
@@ -140,13 +149,13 @@ class Shell(object):
                     string = string.replace(r'\|', unique)
                     parts = string.split("|")
                     if replace:
-                        sys.stdout.write(modifiers.up)
+                        sys.stdout.write(self._modifiers.up)
 
                     if self._indent:
                         sys.stdout.write(' ' * self._indent)
 
                     if self._bold:
-                        sys.stdout.write(ansify(1))
+                        sys.stdout.write(self._modifiers.bold)
 
                     for part, output in zip(parts, printers):
                         output(part.replace(unique, "|"))

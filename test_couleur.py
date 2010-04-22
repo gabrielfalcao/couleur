@@ -155,3 +155,15 @@ def test_update_shell_mixed_with_bold():
     sh.yellow_and_normal_and_red("Yellow| and |Red", True)
     sh.green("Green")
     assert_stdout('\033[1m\033[33mYellow\033[0m\r\033[A\033[1m\033[33mYellow\033[0m\033[39m and \033[0m\033[31mRed\033[0m\033[1m\033[32mGreen\033[0m')
+
+@with_setup(prepare_stdout)
+def test_dont_print_colors_if_set_as_disabled():
+    "disable colors"
+    sh = Shell(disabled=True, linebreak=True, bold=True)
+    sh.yellow("Yellow")
+    sh.indent()
+    sh.indent()
+    sh.yellow_and_red_on_yellow("Yellow| and Red", True)
+    sh.dedent()
+    sh.green("Green")
+    assert_stdout('Yellow\n\r\033[A    Yellow and Red\n  Green\n')
