@@ -17,8 +17,44 @@
 
 import sys
 import uuid
-
 __version__ = '0.2'
+from StringIO import StringIO
+
+class ColorWriter(StringIO):
+    def __init__(self, original):
+        self.original = original
+        self.old_write = original.write
+
+    def translate_colors(self, string):
+        for attr in filter(lambda x: not x.startswith("_"), dir(forecolors)):
+            string = string.replace(
+                "#{%s}" % attr,
+                getattr(forecolors, attr)
+            )
+            string = string.replace(
+                "#{on:%s}" % attr,
+                getattr(backcolors, attr)
+            )
+
+        string = string.replace("\n", "%s\n" % modifiers.reset)
+        return string
+
+    def write(self, what):
+        self.old_write(self.translate_colors(what))
+
+class Proxy(object):
+    def __init__(self, output):
+        self.output = output
+        self.writer = ColorWriter(output)
+
+    def enable(self):
+        self.output.write = self.writer.write
+
+    def disable(self):
+        self.output.write = self.writer.old_write
+
+def proxy(output):
+    return Proxy(output)
 
 def ansify(number):
     """Wraps the given ansi code to a proper escaped python output

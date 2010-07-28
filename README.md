@@ -109,5 +109,5 @@ And run:
 ## Licensing
 
     Copyright (c) 2010 Gabriel Falcão
-    Licensed under LGPL 3+
-    http://www.gnu.org/copyleft/gpl.html
+    Licensed under Apache License 2.0
+    http://www.apache.org/licenses/LICENSE-2.0.html
