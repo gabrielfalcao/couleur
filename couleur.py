@@ -20,6 +20,20 @@ import uuid
 __version__ = '0.2'
 from StringIO import StringIO
 
+def minify(string):
+    regex = re.compile('(\\b\033\[(\d+)m\\b)')
+    found = ";".join(x[1] for x in regex.findall(string))
+    existent = "".join([x[0] for x in regex.findall(string)])
+    replaced = string
+    if found and existent:
+        replaced = string.replace(existent, '\033[%sm' % found)
+        if string == '\033[1m\033[32m\033[47mHello\033[0m\n':
+            import sys
+            sys.stdout = sys.__stdout__
+            sys.stderr = sys.__stderr__
+            import ipdb; ipdb.set_trace()
+    return replaced
+
 def translate_colors(string):
     for attr in re.findall("[#][{]on[:](\w+)[}]", string):
         string = string.replace(
@@ -37,7 +51,7 @@ def translate_colors(string):
         )
 
     string = string.replace("\n", "%s\n" % modifiers.reset)
-    return string
+    return minify(string)
 
 class StdOutMocker(StringIO):
     original = sys.__stdout__

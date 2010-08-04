@@ -35,7 +35,7 @@ def assert_stderr(expected):
 
 @with_setup(prepare_stderr)
 def test_output_black_foreground():
-    "Test stderr filter output: black foreground"
+    "STDERR filter output: black foreground"
 
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{black}Hello Black!\n")
@@ -46,7 +46,7 @@ def test_output_black_foreground():
 
 @with_setup(prepare_stderr)
 def test_output_black_on_white_foreground():
-    "Test stderr filter output: black foreground on white background"
+    "STDERR filter output: black foreground on white background"
 
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{black}#{on:white}Hello Black!\n")
@@ -57,7 +57,7 @@ def test_output_black_on_white_foreground():
 
 @with_setup(prepare_stderr)
 def test_output_green_foreground():
-    "Test stderr filter output: green foreground"
+    "STDERR filter output: green foreground"
 
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{green}Hello Green!\n")
@@ -68,7 +68,7 @@ def test_output_green_foreground():
 
 @with_setup(prepare_stderr)
 def test_output_green_and_red_on_white_foreground():
-    "Test stderr filter output: green foreground and white on red background"
+    "STDERR filter output: green foreground and white on red background"
 
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{green}Hello #{white}#{on:red}Italy!\n")
@@ -78,7 +78,7 @@ def test_output_green_and_red_on_white_foreground():
     assert_stderr('#{black}should not be translated\n')
 
 def test_integration_with_stderr():
-    "Test stderr filter integration"
+    "STDERR filter integration"
 
     sys.stderr = sys.__stderr__
     couleur.proxy(sys.stderr).enable()
