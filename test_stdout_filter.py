@@ -72,7 +72,7 @@ def test_output_green_and_red_on_white_foreground():
 
     couleur.proxy(sys.stdout).enable()
     print "#{green}Hello #{white}#{on:red}Italy!"
-    assert_stdout('\033[32mHello \033[37m\033[41mItaly!\033[0m\n')
+    assert_stdout('\033[32mHello \033[37;41mItaly!\033[0m\n')
     couleur.proxy(sys.stdout).disable()
     print "#{black}should not be translated"
     assert_stdout('#{black}should not be translated\n')

@@ -21,17 +21,18 @@ __version__ = '0.2'
 from StringIO import StringIO
 
 def minify(string):
-    regex = re.compile('(\\b\033\[(\d+)m\\b)')
-    found = ";".join(x[1] for x in regex.findall(string))
-    existent = "".join([x[0] for x in regex.findall(string)])
+    regex_items = re.compile('(\033\[(\d+)m)')
+    regex_main = re.compile('(?P<main>(\033\[(\d+)m){2,})')
+
     replaced = string
-    if found and existent:
-        replaced = string.replace(existent, '\033[%sm' % found)
-        if string == '\033[1m\033[32m\033[47mHello\033[0m\n':
-            import sys
-            sys.stdout = sys.__stdout__
-            sys.stderr = sys.__stderr__
-            import ipdb; ipdb.set_trace()
+    main_found = regex_main.search(string)
+
+    if main_found:
+        existent = main_found.group('main')
+        found = ";".join(x[1] for x in regex_items.findall(existent))
+        if found:
+            replaced = string.replace(existent, '\033[%sm' % found)
+
     return replaced
 
 def translate_colors(string):
