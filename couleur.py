@@ -20,41 +20,65 @@ import uuid
 __version__ = '0.2'
 from StringIO import StringIO
 
-class ColorWriter(StringIO):
-    def __init__(self, original):
-        self.original = original
-        self.old_write = original.write
+def translate_colors(string):
+    for attr in filter(lambda x: not x.startswith("_"), dir(forecolors)):
+        string = string.replace(
+            "#{%s}" % attr,
+            getattr(forecolors, attr)
+        )
+        string = string.replace(
+            "#{on:%s}" % attr,
+            getattr(backcolors, attr)
+        )
 
-    def translate_colors(self, string):
-        for attr in filter(lambda x: not x.startswith("_"), dir(forecolors)):
-            string = string.replace(
-                "#{%s}" % attr,
-                getattr(forecolors, attr)
-            )
-            string = string.replace(
-                "#{on:%s}" % attr,
-                getattr(backcolors, attr)
-            )
+    string = string.replace("\n", "%s\n" % modifiers.reset)
+    return string
 
-        string = string.replace("\n", "%s\n" % modifiers.reset)
-        return string
+class StdOutMocker(StringIO):
+    original = sys.__stdout__
+    def write(self, string):
+        sys.__stdout__.write(translate_colors(string))
 
-    def write(self, what):
-        self.old_write(self.translate_colors(what))
+class StdErrMocker(StringIO):
+    original = sys.__stderr__
+    def write(self, string):
+        sys.__stderr__.write(translate_colors(string))
 
 class Proxy(object):
     def __init__(self, output):
+        self.old_write = output.write
+
+        if output is sys.__stdout__:
+            output = StdOutMocker()
+
+        elif output is sys.__stderr__:
+            output = StdErrMocker()
+
         self.output = output
-        self.writer = ColorWriter(output)
+
 
     def enable(self):
-        self.output.write = self.writer.write
+        if isinstance(self.output, StdOutMocker):
+            sys.stdout = self.output
+        elif isinstance(self.output, StdErrMocker):
+            sys.stderr = self.output
+        else:
+            self.output.write = lambda x: self.old_write(translate_colors(x))
 
     def disable(self):
-        self.output.write = self.writer.old_write
+        if isinstance(self.output, StdOutMocker):
+            sys.stdout = self.output.original
+        elif isinstance(self.output, StdErrMocker):
+            sys.stderr = self.output.original
+        else:
+            self.output.write = self.old_write
 
+_proxy_registry = {}
 def proxy(output):
-    return Proxy(output)
+    if output not in _proxy_registry.keys():
+        _proxy_registry[output] = Proxy(output)
+
+    return _proxy_registry[output]
 
 def ansify(number):
     """Wraps the given ansi code to a proper escaped python output
