@@ -16,6 +16,14 @@ unix terminal
 
 ![stdout filter](http://gnu.gabrielfalcao.com/couleur_filter.png)
 
+#### further
+
+    import sys, couleur
+
+    couleur.proxy(sys.stdout).enable()
+    print "#{bold}#{red}#{on:yellow}This is#{normal} a test"
+    couleur.proxy(sys.stdout).disable()
+
 ### dynamic methods
 
 couleur has a syntax sugar that is semantically nice:
