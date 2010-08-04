@@ -12,6 +12,12 @@ unix terminal
 
 ## nutshell
 
+### file-like objects filter
+
+![stdout filter](http://gnu.gabrielfalcao.com/couleur_filter.png)
+
+### dynamic methods
+
 couleur has a syntax sugar that is semantically nice:
 
     import couleur
