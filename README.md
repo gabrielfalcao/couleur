@@ -1,5 +1,5 @@
 # couleur - ANSI terminal tool for python, colored shell and other handy fancy features
-__Version 0.1__
+__Version 0.2__
 
 __Couleur__ is a handy tool to play around with ANSI features in a
 unix terminal
