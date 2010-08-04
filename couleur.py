@@ -14,21 +14,26 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import re
 import sys
 import uuid
 __version__ = '0.2'
 from StringIO import StringIO
 
 def translate_colors(string):
-    for attr in filter(lambda x: not x.startswith("_"), dir(forecolors)):
-        string = string.replace(
-            "#{%s}" % attr,
-            getattr(forecolors, attr)
-        )
+    for attr in re.findall("[#][{]on[:](\w+)[}]", string):
         string = string.replace(
             "#{on:%s}" % attr,
             getattr(backcolors, attr)
+        )
+
+    for attr in re.findall("[#][{](\w+)[}]", string):
+        string = string.replace(
+            "#{%s}" % attr,
+            getattr(forecolors, attr, "#{%s}" % attr)
+        ).replace(
+            "#{%s}" % attr,
+            getattr(modifiers, attr, "#{%s}" % attr)
         )
 
     string = string.replace("\n", "%s\n" % modifiers.reset)

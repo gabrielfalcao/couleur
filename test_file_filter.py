@@ -70,3 +70,17 @@ def test_output_green_and_red_on_white_foreground():
     io.truncate()
     io.write("#{black}should not be translated\n")
     assert_equals('#{black}should not be translated\n', io.getvalue())
+
+def test_output_bold_green_on_bold_white():
+    "Test stderr filter output: bold green on white"
+
+    io = StringIO()
+    couleur.proxy(io).enable()
+    io.write("#{bold}#{green}#{on:white}Hello\n")
+    assert_equals('\033[1m\033[32m\033[47mHello\033[0m\n', io.getvalue())
+    couleur.proxy(io).disable()
+    io.seek(0)
+    io.truncate()
+    io.write("#{black}should not be translated\n")
+    assert_equals('#{black}should not be translated\n', io.getvalue())
+
