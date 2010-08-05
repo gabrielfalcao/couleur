@@ -87,3 +87,18 @@ def test_output_bold_green_on_bold_white():
 def test_minify():
     assert_equals("\033[1;32;41mHello\n", couleur.minify("\033[1m\033[32m\033[41mHello\n"))
     assert_equals("\033[1;32;41mHello\n", couleur.minify("\033[1;32;41mHello\n"))
+
+def test_ignoring_colors():
+    "file-like filter output: bold green on white"
+
+    io = StringIO()
+    couleur.proxy(io).enable()
+    couleur.proxy(io).ignore()
+    io.write("#{bold}#{green}#{on:white}Hello\n")
+    assert_equals('Hello\n', io.getvalue())
+    couleur.proxy(io).disable()
+    io.seek(0)
+    io.truncate()
+    io.write("#{black}should not be translated\n")
+    assert_equals('#{black}should not be translated\n', io.getvalue())
+

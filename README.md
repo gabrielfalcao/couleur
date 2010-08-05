@@ -22,11 +22,19 @@ unix terminal
 
 #### further
 
-    import sys, couleur
+    >>> import sys, couleur
 
-    couleur.proxy(sys.stdout).enable()
-    print "#{bold}#{red}#{on:yellow}This is#{normal} a test"
-    couleur.proxy(sys.stdout).disable()
+    >>> couleur.proxy(sys.stdout).enable()
+
+    >>> print "#{bold}#{red}#{on:yellow}This is#{normal} a test"
+    u'\x1b[1;31;43mThis is\x1b[39m a test'
+
+    >>> couleur.proxy(sys.stdout).ignore()
+
+    >>> print "#{bold}#{red}#{on:yellow}This is#{normal} a test"
+    u'This is a test'
+
+    >>> couleur.proxy(sys.stdout).disable()
 
 ### dynamic methods
 

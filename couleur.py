@@ -54,15 +54,28 @@ def translate_colors(string):
     string = string.replace("\n", "%s\n" % modifiers.reset)
     return minify(string)
 
-class StdOutMocker(StringIO):
-    original = sys.__stdout__
-    def write(self, string):
-        sys.__stdout__.write(translate_colors(string))
+def ignore_colors(string):
+    for attr in re.findall("[#][{]on[:](\w+)[}]", string):
+        string = string.replace("#{on:%s}" % attr, "")
 
-class StdErrMocker(StringIO):
-    original = sys.__stderr__
+    for attr in re.findall("[#][{](\w+)[}]", string):
+        string = string.replace("#{%s}" % attr, "") \
+             .replace("#{%s}" % attr, "")
+
+    return string
+
+class Writer(StringIO):
+    original = None
+    translate = True
     def write(self, string):
-        sys.__stderr__.write(translate_colors(string))
+        f = self.translate and translate_colors or ignore_colors
+        self.original.write(f(string))
+
+class StdOutMocker(Writer):
+    original = sys.__stdout__
+
+class StdErrMocker(Writer):
+    original = sys.__stderr__
 
 class Proxy(object):
     def __init__(self, output):
@@ -76,8 +89,13 @@ class Proxy(object):
 
         self.output = output
 
+    def ignore(self):
+        self.output.translate = False
+        if not isinstance(self.output, (StdErrMocker, StdOutMocker)):
+            self.output.write = lambda x: self.old_write(ignore_colors(x))
 
     def enable(self):
+        self.output.translate = True
         if isinstance(self.output, StdOutMocker):
             sys.stdout = self.output
         elif isinstance(self.output, StdErrMocker):
