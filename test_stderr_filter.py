@@ -39,7 +39,7 @@ def test_output_black_foreground():
 
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{black}Hello Black!\n")
-    assert_stderr('\033[30mHello Black!\033[0m\n')
+    assert_stderr('\033[30mHello Black!\n')
     couleur.proxy(sys.stderr).disable()
     sys.stderr.write("#{black}should not be translated\n")
     assert_stderr('#{black}should not be translated\n')
@@ -50,7 +50,7 @@ def test_output_black_on_white_foreground():
 
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{black}#{on:white}Hello Black!\n")
-    assert_stderr('\033[30;47mHello Black!\033[0m\n')
+    assert_stderr('\033[30;47mHello Black!\n')
     couleur.proxy(sys.stderr).disable()
     sys.stderr.write("#{black}should not be translated\n")
     assert_stderr('#{black}should not be translated\n')
@@ -61,7 +61,7 @@ def test_output_green_foreground():
 
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{green}Hello Green!\n")
-    assert_stderr('\033[32mHello Green!\033[0m\n')
+    assert_stderr('\033[32mHello Green!\n')
     couleur.proxy(sys.stderr).disable()
     sys.stderr.write("#{black}should not be translated\n")
     assert_stderr('#{black}should not be translated\n')
@@ -72,7 +72,7 @@ def test_output_green_and_red_on_white_foreground():
 
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{green}Hello #{white}#{on:red}Italy!\n")
-    assert_stderr('\033[32mHello \033[37;41mItaly!\033[0m\n')
+    assert_stderr('\033[32mHello \033[37;41mItaly!\n')
     couleur.proxy(sys.stderr).disable()
     sys.stderr.write("#{black}should not be translated\n")
     assert_stderr('#{black}should not be translated\n')

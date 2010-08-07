@@ -38,7 +38,7 @@ def test_output_black_foreground():
     "STDOUT filter output: black foreground"
 
     couleur.proxy(sys.stdout).enable()
-    print "#{black}Hello Black!"
+    print "#{black}Hello Black!#{reset}"
     assert_stdout('\033[30mHello Black!\033[0m\n')
     couleur.proxy(sys.stdout).disable()
     print "#{black}should not be translated"
@@ -49,7 +49,7 @@ def test_output_black_on_white_foreground():
     "STDOUT filter output: black foreground on white background"
 
     couleur.proxy(sys.stdout).enable()
-    print "#{black}#{on:white}Hello Black!"
+    print "#{black}#{on:white}Hello Black!#{reset}"
     assert_stdout('\033[30;47mHello Black!\033[0m\n')
     couleur.proxy(sys.stdout).disable()
     print "#{black}should not be translated"
@@ -60,7 +60,7 @@ def test_output_green_foreground():
     "STDOUT filter output: green foreground"
 
     couleur.proxy(sys.stdout).enable()
-    print "#{green}Hello Green!"
+    print "#{green}Hello Green!#{reset}"
     assert_stdout('\033[32mHello Green!\033[0m\n')
     couleur.proxy(sys.stdout).disable()
     print "#{black}should not be translated"
@@ -71,7 +71,7 @@ def test_output_green_and_red_on_white_foreground():
     "STDOUT filter output: green foreground and white on red background"
 
     couleur.proxy(sys.stdout).enable()
-    print "#{green}Hello #{white}#{on:red}Italy!"
+    print "#{green}Hello #{white}#{on:red}Italy!#{reset}"
     assert_stdout('\033[32mHello \033[37;41mItaly!\033[0m\n')
     couleur.proxy(sys.stdout).disable()
     print "#{black}should not be translated"

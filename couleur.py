@@ -51,7 +51,6 @@ def translate_colors(string):
             getattr(modifiers, attr, "#{%s}" % attr)
         )
 
-    string = string.replace("\n", "%s\n" % modifiers.reset)
     return minify(string)
 
 def ignore_colors(string):
@@ -95,6 +94,8 @@ class Proxy(object):
             self.output.write = lambda x: self.old_write(ignore_colors(x))
 
     def enable(self):
+        self.disable()
+
         self.output.translate = True
         if isinstance(self.output, StdOutMocker):
             sys.stdout = self.output
