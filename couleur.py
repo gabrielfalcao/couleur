@@ -17,7 +17,7 @@
 import re
 import sys
 import uuid
-__version__ = '0.2'
+__version__ = '0.3'
 from StringIO import StringIO
 
 def minify(string):
@@ -54,6 +54,13 @@ def translate_colors(string):
     return minify(string)
 
 def ignore_colors(string):
+    up_count_regex = re.compile(ur'[#][{]up[}]')
+    up_count = len(up_count_regex.findall(string)) or 1
+
+    expression = u'([#][{]up[}])+.*(?P<end>\\n.*){%d}' % up_count
+    up_supress_regex = re.compile(expression, re.DOTALL)
+    string = up_supress_regex.sub('\g<end>', string)
+
     for attr in re.findall("[#][{]on[:](\w+)[}]", string):
         string = string.replace("#{on:%s}" % attr, "")
 

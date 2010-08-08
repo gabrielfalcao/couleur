@@ -102,3 +102,25 @@ def test_ignoring_colors():
     io.write("#{black}should not be translated\n")
     assert_equals('#{black}should not be translated\n', io.getvalue())
 
+
+def test_supress_up_when_ignoring_colors():
+    "file-like filter output: supress #{up} when ignoring colors"
+
+    io = StringIO()
+    couleur.proxy(io).enable()
+    couleur.proxy(io).ignore()
+    io.write("This is visible#{up}but this is invisible\n")
+    assert_equals('This is visible\n', io.getvalue())
+
+def test_supress_up_when_ignoring_colors_as_many_times_needed():
+    "file-like filter output: supress #{up} as many times as needed"
+
+    io = StringIO()
+    couleur.proxy(io).enable()
+    couleur.proxy(io).ignore()
+    io.write("This is visible#{up}#{up}#{up}#{up}\n" \
+        " Line one supressed\n" \
+        " Line two supressed\n" \
+        " Line three supressed\n")
+    assert_equals('This is visible\n', io.getvalue())
+

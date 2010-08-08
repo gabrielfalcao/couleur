@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import couleur
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(name='couleur',
     version=couleur.__version__,
@@ -24,5 +24,6 @@ setup(name='couleur',
         'handy fancy features',
     author=u'Gabriel Falcão',
     author_email='gabriel@nacaolivre.org',
+    url='http://github.com/gabrielfalcao/couleur',
     py_modules=['couleur'],
 )
