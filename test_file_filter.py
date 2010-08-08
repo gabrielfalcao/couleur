@@ -89,7 +89,7 @@ def test_minify():
     assert_equals("\033[1;32;41mHello\n", couleur.minify("\033[1;32;41mHello\n"))
 
 def test_ignoring_colors():
-    "file-like filter output: bold green on white"
+    "file-like filter output: ignoring output"
 
     io = StringIO()
     couleur.proxy(io).enable()

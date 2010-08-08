@@ -77,6 +77,21 @@ def test_output_green_and_red_on_white_foreground():
     print "#{black}should not be translated"
     assert_stdout('#{black}should not be translated\n')
 
+@with_setup(prepare_stdout)
+def test_output_stdout_ignoring_output():
+    "STDOUT filter output: green foreground and white on red background"
+
+    couleur.proxy(sys.stdout).enable()
+    couleur.proxy(sys.stdout).ignore()
+    print "#{green}Hello #{white}#{on:blue}World!#{reset}"
+    assert_stdout('Hello World!\n')
+    couleur.proxy(sys.stdout).enable()
+    print "#{green}Hi There!"
+    assert_stdout('\033[32mHi There!\n')
+    couleur.proxy(sys.stdout).disable()
+    print "#{black}should not be translated"
+    assert_stdout('#{black}should not be translated\n')
+
 def test_integration_with_stdout():
     "STDOUT filter integration"
 

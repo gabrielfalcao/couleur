@@ -77,6 +77,21 @@ def test_output_green_and_red_on_white_foreground():
     sys.stderr.write("#{black}should not be translated\n")
     assert_stderr('#{black}should not be translated\n')
 
+@with_setup(prepare_stderr)
+def test_errput_stderr_ignoring_errput():
+    "STDERR filter errput: ignoring output"
+
+    couleur.proxy(sys.stderr).enable()
+    couleur.proxy(sys.stderr).ignore()
+    sys.stderr.write("#{green}Hello #{white}#{on:blue}World!#{reset}\n")
+    assert_stderr('Hello World!\n')
+    couleur.proxy(sys.stderr).enable()
+    sys.stderr.write("#{green}Hi There!\n")
+    assert_stderr('\033[32mHi There!\n')
+    couleur.proxy(sys.stderr).disable()
+    sys.stderr.write("#{black}should not be translated\n")
+    assert_stderr('#{black}should not be translated\n')
+
 def test_integration_with_stderr():
     "STDERR filter integration"
 
