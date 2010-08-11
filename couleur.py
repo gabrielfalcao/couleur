@@ -57,9 +57,9 @@ def ignore_colors(string):
     up_count_regex = re.compile(ur'[#][{]up[}]')
     up_count = len(up_count_regex.findall(string)) or 1
 
-    expression = u'([#][{]up[}])+.*(?P<end>\\n.*){%d}' % up_count
-    up_supress_regex = re.compile(expression, re.DOTALL)
-    string = up_supress_regex.sub('\g<end>', string)
+    expression = u'^([#][{]up[}])+(?P<end>.*\\n){%d}' % up_count
+    up_supress_regex = re.compile(expression, re.MULTILINE)
+    string = up_supress_regex.sub('', string)
 
     for attr in re.findall("[#][{]on[:](\w+)[}]", string):
         string = string.replace("#{on:%s}" % attr, "")
