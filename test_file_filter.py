@@ -109,8 +109,8 @@ def test_supress_up_when_ignoring_colors():
     io = StringIO()
     couleur.proxy(io).enable()
     couleur.proxy(io).ignore()
-    io.write("#{up}but this is invisible\n")
-    assert_equals('', io.getvalue())
+    io.write("This is visible#{up}but this is invisible\n")
+    assert_equals('This is visible', io.getvalue())
 
 def test_supress_up_when_ignoring_colors_as_many_times_needed():
     "file-like filter output: supress #{up} as many times as needed"
@@ -118,9 +118,9 @@ def test_supress_up_when_ignoring_colors_as_many_times_needed():
     io = StringIO()
     couleur.proxy(io).enable()
     couleur.proxy(io).ignore()
-    io.write("#{up}#{up}#{up}#{up}\n" \
+    io.write("This is visible#{up}#{up}#{up}#{up}\n" \
         " Line one supressed\n" \
         " Line two supressed\n" \
         " Line three supressed\n")
-    assert_equals('', io.getvalue())
+    assert_equals('This is visible', io.getvalue())
 
