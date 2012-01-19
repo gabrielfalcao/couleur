@@ -35,7 +35,7 @@ def minify(string):
 
     return replaced
 
-def translate_colors(string):
+def translate_colors(string, l='#{', r='}'):
     def colors_repl(matchobj):
         if matchobj.group(1) is None:
             # foreground and modifiers
@@ -48,18 +48,23 @@ def translate_colors(string):
             # background
             return getattr(backcolors, matchobj.group(2), matchobj.group(0))
 
-    string = re.sub(r'#\{(on:)?(\w+)\}', colors_repl, string)
+    l = re.escape(l)
+    r = re.escape(r)
+    string = re.sub(r'{}(on:)?(\w+){}'.format(l,r), colors_repl, string)
     return minify(string)
 
-def ignore_colors(string):
-    up_count_regex = re.compile(r'#\{up\}')
+def ignore_colors(string, l='#{', r='}'):
+    l = re.escape(l)
+    r = re.escape(r)
+
+    up_count_regex = re.compile(r'{}up{}'.format(l,r))
     up_count = len(up_count_regex.findall(string)) or 1
 
-    expression = r'^(?P<start>.*)(#\{up\})+(.*\n){%d}' % up_count
+    expression = r'^(?P<start>.*)({}up{})+(.*\n){}'.format(l,r,'{%d}') % up_count
     up_supress_regex = re.compile(expression, re.MULTILINE)
     string = up_supress_regex.sub('\g<start>', string)
 
-    return re.sub(r'#\{(?:on:)?\w+\}', '', string)
+    return re.sub(r'{}(?:on:)?\w+{}'.format(l,r), '', string)
 
 class Writer(StringIO):
     original = None
