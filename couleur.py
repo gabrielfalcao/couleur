@@ -36,39 +36,30 @@ def minify(string):
     return replaced
 
 def translate_colors(string):
-    for attr in re.findall("[#][{]on[:](\w+)[}]", string):
-        string = string.replace(
-            "#{on:%s}" % attr,
-            getattr(backcolors, attr)
-        )
+    def colors_repl(matchobj):
+        if matchobj.group(1) is None:
+            # foreground and modifiers
+            attr = matchobj.group(2)
+            if hasattr(forecolors, attr):
+                return getattr(forecolors, attr)
+            else:
+                return getattr(modifiers, attr, matchobj.group(0))
+        else:
+            # background
+            return getattr(backcolors, matchobj.group(2), matchobj.group(0))
 
-    for attr in re.findall("[#][{](\w+)[}]", string):
-        string = string.replace(
-            "#{%s}" % attr,
-            getattr(forecolors, attr, "#{%s}" % attr)
-        ).replace(
-            "#{%s}" % attr,
-            getattr(modifiers, attr, "#{%s}" % attr)
-        )
-
+    string = re.sub(r'#\{(on:)?(\w+)\}', colors_repl, string)
     return minify(string)
 
 def ignore_colors(string):
-    up_count_regex = re.compile(ur'[#][{]up[}]')
+    up_count_regex = re.compile(r'#\{up\}')
     up_count = len(up_count_regex.findall(string)) or 1
 
-    expression = u'^(?P<start>.*)([#][{]up[}])+(.*\\n){%d}' % up_count
+    expression = r'^(?P<start>.*)(#\{up\})+(.*\n){%d}' % up_count
     up_supress_regex = re.compile(expression, re.MULTILINE)
     string = up_supress_regex.sub('\g<start>', string)
 
-    for attr in re.findall("[#][{]on[:](\w+)[}]", string):
-        string = string.replace("#{on:%s}" % attr, "")
-
-    for attr in re.findall("[#][{](\w+)[}]", string):
-        string = string.replace("#{%s}" % attr, "") \
-             .replace("#{%s}" % attr, "")
-
-    return string
+    return re.sub(r'#\{(?:on:)?\w+\}', '', string)
 
 class Writer(StringIO):
     original = None
