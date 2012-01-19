@@ -69,6 +69,9 @@ def ignore_colors(string, l='#{', r='}'):
 class Writer(StringIO):
     original = None
     translate = True
+    l = '#{'
+    r = '}'
+
     def write(self, string):
         f = self.translate and translate_colors or ignore_colors
         self.original.write(f(string))
@@ -80,21 +83,27 @@ class StdErrMocker(Writer):
     original = sys.__stderr__
 
 class Proxy(object):
-    def __init__(self, output):
+    def __init__(self, output, l='#{', r='}'):
         self.old_write = output.write
+        self.l = l
+        self.r = r
 
         if output is sys.__stdout__:
             output = StdOutMocker()
+            output.l = l
+            output.r = r
 
         elif output is sys.__stderr__:
             output = StdErrMocker()
+            output.l = l
+            output.r = r
 
         self.output = output
 
     def ignore(self):
         self.output.translate = False
         if not isinstance(self.output, (StdErrMocker, StdOutMocker)):
-            self.output.write = lambda x: self.old_write(ignore_colors(x))
+            self.output.write = lambda x: self.old_write(ignore_colors(x, self.l, self.r))
 
     def enable(self):
         self.disable()
@@ -105,7 +114,7 @@ class Proxy(object):
         elif isinstance(self.output, StdErrMocker):
             sys.stderr = self.output
         else:
-            self.output.write = lambda x: self.old_write(translate_colors(x))
+            self.output.write = lambda x: self.old_write(translate_colors(x, self.l, self.r))
 
     def disable(self):
         if isinstance(self.output, StdOutMocker):
@@ -116,9 +125,9 @@ class Proxy(object):
             self.output.write = self.old_write
 
 _proxy_registry = {}
-def proxy(output):
+def proxy(output, l='#{', r='}'):
     if output not in _proxy_registry.keys():
-        _proxy_registry[output] = Proxy(output)
+        _proxy_registry[output] = Proxy(output, l, r)
 
     return _proxy_registry[output]
 
