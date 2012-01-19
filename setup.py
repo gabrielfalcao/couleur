@@ -15,15 +15,32 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import couleur
 from setuptools import setup
+import sys
+
+extra = {}
+if sys.version_info >= (3,0):
+    u = str
+    extra.update( use_2to3 = True )
+else:
+    u = lambda s: unicode(s, 'utf8')
+
 
 setup(name='couleur',
-    version=couleur.__version__,
+    version=0.3,
     description='ANSI terminal tool for python, colored shell and other ' \
         'handy fancy features',
-    author=u'Gabriel Falcão',
+    author=u('Gabriel Falcão'),
     author_email='gabriel@nacaolivre.org',
     url='http://github.com/gabrielfalcao/couleur',
     py_modules=['couleur'],
+    classifiers = [
+        'Development Status :: 5 - Production/Stable',
+        'License :: OSI Approved :: Apache Software License',
+        "Operating System :: POSIX",
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
+    ],
+    **extra
 )
