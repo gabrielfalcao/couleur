@@ -27,7 +27,7 @@ else:
 
 
 setup(name='couleur',
-    version=0.3.1,
+    version='0.3.1',
     description='ANSI terminal tool for python, colored shell and other ' \
         'handy fancy features',
     author=u('Gabriel Falcão'),
