@@ -45,6 +45,17 @@ def test_output_black_foreground():
     assert_stdout('#{black}should not be translated\n')
 
 @with_setup(prepare_stdout)
+def test_output_black_foreground_alternative():
+    "STDOUT filter output: black foreground with alternative markers"
+
+    couleur.proxy(sys.stdout, '<', '>').enable()
+    print "<black>Hello Black!<reset>"
+    assert_stdout('\033[30mHello Black!\033[0m\n')
+    couleur.proxy(sys.stdout).disable()
+    print "<black>should not be translated"
+    assert_stdout('<black>should not be translated\n')
+
+@with_setup(prepare_stdout)
 def test_output_black_on_white_foreground():
     "STDOUT filter output: black foreground on white background"
 
@@ -54,6 +65,17 @@ def test_output_black_on_white_foreground():
     couleur.proxy(sys.stdout).disable()
     print "#{black}should not be translated"
     assert_stdout('#{black}should not be translated\n')
+
+@with_setup(prepare_stdout)
+def test_output_black_on_white_foreground_alternative():
+    "STDOUT filter output: black foreground on white background"
+
+    couleur.proxy(sys.stdout, '<', '>').enable()
+    print "<black><on:white>Hello Black!<reset>"
+    assert_stdout('\033[30;47mHello Black!\033[0m\n')
+    couleur.proxy(sys.stdout).disable()
+    print "<black>should not be translated"
+    assert_stdout('<black>should not be translated\n')
 
 @with_setup(prepare_stdout)
 def test_output_green_foreground():
@@ -67,6 +89,17 @@ def test_output_green_foreground():
     assert_stdout('#{black}should not be translated\n')
 
 @with_setup(prepare_stdout)
+def test_output_green_foreground_alternative():
+    "STDOUT filter output: green foreground"
+
+    couleur.proxy(sys.stdout, '<', '>').enable()
+    print "<green>Hello Green!<reset>"
+    assert_stdout('\033[32mHello Green!\033[0m\n')
+    couleur.proxy(sys.stdout).disable()
+    print "<black>should not be translated"
+    assert_stdout('<black>should not be translated\n')
+
+@with_setup(prepare_stdout)
 def test_output_green_and_red_on_white_foreground():
     "STDOUT filter output: green foreground and white on red background"
 
@@ -76,6 +109,17 @@ def test_output_green_and_red_on_white_foreground():
     couleur.proxy(sys.stdout).disable()
     print "#{black}should not be translated"
     assert_stdout('#{black}should not be translated\n')
+
+@with_setup(prepare_stdout)
+def test_output_green_and_red_on_white_foreground_alternative():
+    "STDOUT filter output: green foreground and white on red background"
+
+    couleur.proxy(sys.stdout, '<', '>').enable()
+    print "<green>Hello <white><on:red>Italy!<reset>"
+    assert_stdout('\033[32mHello \033[37;41mItaly!\033[0m\n')
+    couleur.proxy(sys.stdout).disable()
+    print "<black>should not be translated"
+    assert_stdout('<black>should not be translated\n')
 
 @with_setup(prepare_stdout)
 def test_output_stdout_ignoring_output():
@@ -92,11 +136,35 @@ def test_output_stdout_ignoring_output():
     print "#{black}should not be translated"
     assert_stdout('#{black}should not be translated\n')
 
+@with_setup(prepare_stdout)
+def test_output_stdout_ignoring_output_alternative():
+    "STDOUT filter output: green foreground and white on red background"
+
+    couleur.proxy(sys.stdout, '<', '>').enable()
+    couleur.proxy(sys.stdout).ignore()
+    print "<green>Hello <white><on:blue>World!<reset>"
+    assert_stdout('Hello World!\n')
+    couleur.proxy(sys.stdout, '<', '>').enable()
+    print "<green>Hi There!"
+    assert_stdout('\033[32mHi There!\n')
+    couleur.proxy(sys.stdout).disable()
+    print "<black>should not be translated"
+    assert_stdout('<black>should not be translated\n')
+
 def test_integration_with_stdout():
     "STDOUT filter integration"
 
     sys.stdout = sys.__stdout__
     couleur.proxy(sys.stdout).enable()
+    assert sys.stdout is not sys.__stdout__
+    couleur.proxy(sys.stdout).disable()
+    assert sys.stdout is sys.__stdout__
+
+def test_integration_with_stdout_alternative():
+    "STDOUT filter integration"
+
+    sys.stdout = sys.__stdout__
+    couleur.proxy(sys.stdout, '<', '>').enable()
     assert sys.stdout is not sys.__stdout__
     couleur.proxy(sys.stdout).disable()
     assert sys.stdout is sys.__stdout__

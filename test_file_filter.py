@@ -32,12 +32,38 @@ def test_output_black_foreground():
     io.write("#{black}should not be translated\n")
     assert_equals('#{black}should not be translated\n', io.getvalue())
 
+def test_output_black_foreground_alternative():
+    "file-like filter output: black foreground with alternative markers"
+
+    io = StringIO()
+    couleur.proxy(io, '<', '>').enable()
+    io.write("<black>Hello Black!\n")
+    assert_equals('\033[30mHello Black!\n', io.getvalue())
+    couleur.proxy(io).disable()
+    io.seek(0)
+    io.truncate()
+    io.write("#{black}should not be translated\n")
+    assert_equals('#{black}should not be translated\n', io.getvalue())
+
 def test_output_black_on_white_foreground():
     "file-like filter output: black foreground on white background"
 
     io = StringIO()
     couleur.proxy(io).enable()
     io.write("#{black}#{on:white}Hello Black!\n")
+    assert_equals('\033[30;47mHello Black!\n', io.getvalue())
+    couleur.proxy(io).disable()
+    io.seek(0)
+    io.truncate()
+    io.write("#{black}should not be translated\n")
+    assert_equals('#{black}should not be translated\n', io.getvalue())
+
+def test_output_black_on_white_foreground_alternative():
+    "file-like filter output: black foreground on white background with alternative markers"
+
+    io = StringIO()
+    couleur.proxy(io, '<', '>').enable()
+    io.write("<black><on:white>Hello Black!\n")
     assert_equals('\033[30;47mHello Black!\n', io.getvalue())
     couleur.proxy(io).disable()
     io.seek(0)
@@ -58,6 +84,19 @@ def test_output_green_foreground():
     io.write("#{black}should not be translated\n")
     assert_equals('#{black}should not be translated\n', io.getvalue())
 
+def test_output_green_foreground_alternative():
+    "file-like filter output: green foreground with alternative markers"
+
+    io = StringIO()
+    couleur.proxy(io, '<', '>').enable()
+    io.write("<green>Hello Green!\n")
+    assert_equals('\033[32mHello Green!\n', io.getvalue())
+    couleur.proxy(io).disable()
+    io.seek(0)
+    io.truncate()
+    io.write("#{black}should not be translated\n")
+    assert_equals('#{black}should not be translated\n', io.getvalue())
+
 def test_output_green_and_red_on_white_foreground():
     "file-like filter output: green foreground and white on red background"
 
@@ -71,12 +110,38 @@ def test_output_green_and_red_on_white_foreground():
     io.write("#{black}should not be translated\n")
     assert_equals('#{black}should not be translated\n', io.getvalue())
 
+def test_output_green_and_red_on_white_foreground_alternative():
+    "file-like filter output: green foreground and white on red background with alternative markers"
+
+    io = StringIO()
+    couleur.proxy(io, '<', '>').enable()
+    io.write("<green>Hello <white><on:red>Italy!\n")
+    assert_equals('\033[32mHello \033[37;41mItaly!\n', io.getvalue())
+    couleur.proxy(io).disable()
+    io.seek(0)
+    io.truncate()
+    io.write("#{black}should not be translated\n")
+    assert_equals('#{black}should not be translated\n', io.getvalue())
+
 def test_output_bold_green_on_bold_white():
     "file-like filter output: bold green on white"
 
     io = StringIO()
     couleur.proxy(io).enable()
     io.write("#{bold}#{green}#{on:white}Hello\n")
+    assert_equals('\033[1;32;47mHello\n', io.getvalue())
+    couleur.proxy(io).disable()
+    io.seek(0)
+    io.truncate()
+    io.write("#{black}should not be translated\n")
+    assert_equals('#{black}should not be translated\n', io.getvalue())
+
+def test_output_bold_green_on_bold_white_alternative():
+    "file-like filter output: bold green on white with alternative markers"
+
+    io = StringIO()
+    couleur.proxy(io, '<', '>').enable()
+    io.write("<bold><green><on:white>Hello\n")
     assert_equals('\033[1;32;47mHello\n', io.getvalue())
     couleur.proxy(io).disable()
     io.seek(0)
@@ -102,6 +167,20 @@ def test_ignoring_colors():
     io.write("#{black}should not be translated\n")
     assert_equals('#{black}should not be translated\n', io.getvalue())
 
+def test_ignoring_colors_alternative():
+    "file-like filter output: ignoring output with alternative markers"
+
+    io = StringIO()
+    couleur.proxy(io, '<', '>').enable()
+    couleur.proxy(io).ignore()
+    io.write("<bold><green><on:white>Hello\n")
+    assert_equals('Hello\n', io.getvalue())
+    couleur.proxy(io).disable()
+    io.seek(0)
+    io.truncate()
+    io.write("#{black}should not be translated\n")
+    assert_equals('#{black}should not be translated\n', io.getvalue())
+
 
 def test_supress_up_when_ignoring_colors():
     "file-like filter output: supress #{up} when ignoring colors"
@@ -112,6 +191,15 @@ def test_supress_up_when_ignoring_colors():
     io.write("This is visible#{up}but this is invisible\n")
     assert_equals('This is visible', io.getvalue())
 
+def test_supress_up_when_ignoring_colors_alternative():
+    "file-like filter output: supress #{up} when ignoring colors with alternative markers"
+
+    io = StringIO()
+    couleur.proxy(io, '<', '>').enable()
+    couleur.proxy(io).ignore()
+    io.write("This is visible<up>but this is invisible\n")
+    assert_equals('This is visible', io.getvalue())
+
 def test_supress_up_when_ignoring_colors_as_many_times_needed():
     "file-like filter output: supress #{up} as many times as needed"
 
@@ -119,6 +207,18 @@ def test_supress_up_when_ignoring_colors_as_many_times_needed():
     couleur.proxy(io).enable()
     couleur.proxy(io).ignore()
     io.write("This is visible#{up}#{up}#{up}#{up}\n" \
+        " Line one supressed\n" \
+        " Line two supressed\n" \
+        " Line three supressed\n")
+    assert_equals('This is visible', io.getvalue())
+
+def test_supress_up_when_ignoring_colors_as_many_times_needed_alternative():
+    "file-like filter output: supress #{up} as many times as needed with alternative markers"
+
+    io = StringIO()
+    couleur.proxy(io, '<', '>').enable()
+    couleur.proxy(io).ignore()
+    io.write("This is visible<up><up><up><up>\n" \
         " Line one supressed\n" \
         " Line two supressed\n" \
         " Line three supressed\n")
