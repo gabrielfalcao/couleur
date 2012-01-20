@@ -35,47 +35,46 @@ def minify(string):
 
     return replaced
 
-def translate_colors(string):
-    for attr in re.findall("[#][{]on[:](\w+)[}]", string):
-        string = string.replace(
-            "#{on:%s}" % attr,
-            getattr(backcolors, attr)
-        )
+def translate_colors(string, l='#{', r='}'):
+    def colors_repl(matchobj):
+        if matchobj.group(1) is None:
+            # foreground and modifiers
+            attr = matchobj.group(2)
+            if hasattr(forecolors, attr):
+                return getattr(forecolors, attr)
+            else:
+                return getattr(modifiers, attr, matchobj.group(0))
+        else:
+            # background
+            return getattr(backcolors, matchobj.group(2), matchobj.group(0))
 
-    for attr in re.findall("[#][{](\w+)[}]", string):
-        string = string.replace(
-            "#{%s}" % attr,
-            getattr(forecolors, attr, "#{%s}" % attr)
-        ).replace(
-            "#{%s}" % attr,
-            getattr(modifiers, attr, "#{%s}" % attr)
-        )
-
+    l = re.escape(l)
+    r = re.escape(r)
+    string = re.sub(r'{}(on:)?(\w+){}'.format(l,r), colors_repl, string)
     return minify(string)
 
-def ignore_colors(string):
-    up_count_regex = re.compile(ur'[#][{]up[}]')
+def ignore_colors(string, l='#{', r='}'):
+    l = re.escape(l)
+    r = re.escape(r)
+
+    up_count_regex = re.compile(r'{}up{}'.format(l,r))
     up_count = len(up_count_regex.findall(string)) or 1
 
-    expression = u'^(?P<start>.*)([#][{]up[}])+(.*\\n){%d}' % up_count
+    expression = r'^(?P<start>.*)({}up{})+(.*\n){}'.format(l,r,'{%d}') % up_count
     up_supress_regex = re.compile(expression, re.MULTILINE)
     string = up_supress_regex.sub('\g<start>', string)
 
-    for attr in re.findall("[#][{]on[:](\w+)[}]", string):
-        string = string.replace("#{on:%s}" % attr, "")
-
-    for attr in re.findall("[#][{](\w+)[}]", string):
-        string = string.replace("#{%s}" % attr, "") \
-             .replace("#{%s}" % attr, "")
-
-    return string
+    return re.sub(r'{}(?:on:)?\w+{}'.format(l,r), '', string)
 
 class Writer(StringIO):
     original = None
     translate = True
+    l = '#{'
+    r = '}'
+
     def write(self, string):
-        f = self.translate and translate_colors or ignore_colors
-        self.original.write(f(string))
+        f = translate_colors if self.translate else ignore_colors
+        self.original.write(f(string, self.l, self.r))
 
 class StdOutMocker(Writer):
     original = sys.__stdout__
@@ -84,6 +83,9 @@ class StdErrMocker(Writer):
     original = sys.__stderr__
 
 class Proxy(object):
+    l = '#{'
+    r = '}'
+
     def __init__(self, output):
         self.old_write = output.write
 
@@ -98,18 +100,24 @@ class Proxy(object):
     def ignore(self):
         self.output.translate = False
         if not isinstance(self.output, (StdErrMocker, StdOutMocker)):
-            self.output.write = lambda x: self.old_write(ignore_colors(x))
+            self.output.write = lambda x: self.old_write(ignore_colors(x, self.l, self.r))
 
-    def enable(self):
+    def enable(self, l='#{', r='}'):
         self.disable()
+        self.l = l
+        self.r = r
 
         self.output.translate = True
         if isinstance(self.output, StdOutMocker):
             sys.stdout = self.output
+            sys.stdout.l = l
+            sys.stdout.r = r
         elif isinstance(self.output, StdErrMocker):
             sys.stderr = self.output
+            sys.stdout.l = l
+            sys.stdout.r = r
         else:
-            self.output.write = lambda x: self.old_write(translate_colors(x))
+            self.output.write = lambda x: self.old_write(translate_colors(x, l, r))
 
     def disable(self):
         if isinstance(self.output, StdOutMocker):
@@ -121,7 +129,7 @@ class Proxy(object):
 
 _proxy_registry = {}
 def proxy(output):
-    if output not in _proxy_registry.keys():
+    if output not in list(_proxy_registry.keys()):
         _proxy_registry[output] = Proxy(output)
 
     return _proxy_registry[output]
