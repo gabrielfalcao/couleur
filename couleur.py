@@ -73,8 +73,8 @@ class Writer(StringIO):
     r = '}'
 
     def write(self, string):
-        f = self.translate and translate_colors or ignore_colors
-        self.original.write(f(string))
+        f = translate_colors if self.translate else ignore_colors
+        self.original.write(f(string, self.l, self.r))
 
 class StdOutMocker(Writer):
     original = sys.__stdout__
@@ -83,20 +83,17 @@ class StdErrMocker(Writer):
     original = sys.__stderr__
 
 class Proxy(object):
-    def __init__(self, output, l='#{', r='}'):
+    l = '#{'
+    r = '}'
+
+    def __init__(self, output):
         self.old_write = output.write
-        self.l = l
-        self.r = r
 
         if output is sys.__stdout__:
             output = StdOutMocker()
-            output.l = l
-            output.r = r
 
         elif output is sys.__stderr__:
             output = StdErrMocker()
-            output.l = l
-            output.r = r
 
         self.output = output
 
@@ -105,16 +102,22 @@ class Proxy(object):
         if not isinstance(self.output, (StdErrMocker, StdOutMocker)):
             self.output.write = lambda x: self.old_write(ignore_colors(x, self.l, self.r))
 
-    def enable(self):
+    def enable(self, l='#{', r='}'):
         self.disable()
+        self.l = l
+        self.r = r
 
         self.output.translate = True
         if isinstance(self.output, StdOutMocker):
             sys.stdout = self.output
+            sys.stdout.l = l
+            sys.stdout.r = r
         elif isinstance(self.output, StdErrMocker):
             sys.stderr = self.output
+            sys.stdout.l = l
+            sys.stdout.r = r
         else:
-            self.output.write = lambda x: self.old_write(translate_colors(x, self.l, self.r))
+            self.output.write = lambda x: self.old_write(translate_colors(x, l, r))
 
     def disable(self):
         if isinstance(self.output, StdOutMocker):
@@ -125,9 +128,9 @@ class Proxy(object):
             self.output.write = self.old_write
 
 _proxy_registry = {}
-def proxy(output, l='#{', r='}'):
-    if output not in _proxy_registry.keys():
-        _proxy_registry[output] = Proxy(output, l, r)
+def proxy(output):
+    if output not in list(_proxy_registry.keys()):
+        _proxy_registry[output] = Proxy(output)
 
     return _proxy_registry[output]
 
