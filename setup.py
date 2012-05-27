@@ -42,5 +42,7 @@ setup(name='couleur',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
     ],
+    tests_require=['nose'],
+    test_suite='nose.collector',
     **extra
 )
