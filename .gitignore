@@ -1,3 +1,4 @@
 *.pyc
 .coverage
 couleur.egg-info/
+.tox
