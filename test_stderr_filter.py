@@ -15,8 +15,13 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
-from StringIO import StringIO
-from nose.tools import with_setup, assert_equals
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
+from nose.tools import with_setup, assert_equal
 
 import couleur
 
@@ -31,7 +36,7 @@ def assert_stderr(expected):
     string = sys.stderr.getvalue()
     sys.stderr.seek(0)
     sys.stderr.truncate()
-    assert_equals(string, expected)
+    assert_equal(string, expected)
 
 @with_setup(prepare_stderr)
 def test_output_black_foreground():

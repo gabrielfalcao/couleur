@@ -18,7 +18,16 @@ import re
 import sys
 import uuid
 __version__ = '0.3'
-from StringIO import StringIO
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
+try:
+    unicode
+except NameError:
+    unicode = str
 
 def minify(string):
     regex_items = re.compile('(\033\[(\d+)m)')
@@ -54,10 +63,10 @@ def translate_colors(string):
     return minify(string)
 
 def ignore_colors(string):
-    up_count_regex = re.compile(ur'[#][{]up[}]')
+    up_count_regex = re.compile(r'[#][{]up[}]')
     up_count = len(up_count_regex.findall(string)) or 1
 
-    expression = u'^(?P<start>.*)([#][{]up[}])+(.*\\n){%d}' % up_count
+    expression = '^(?P<start>.*)([#][{]up[}])+(.*\\n){%d}' % up_count
     up_supress_regex = re.compile(expression, re.MULTILINE)
     string = up_supress_regex.sub('\g<start>', string)
 

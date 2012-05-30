@@ -15,8 +15,12 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
-from StringIO import StringIO
-from nose.tools import with_setup, assert_equals
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
+from nose.tools import with_setup, assert_equal
 
 from couleur import ansify
 from couleur import Shell
@@ -30,11 +34,11 @@ def prepare_stdout():
 
 def assert_stdout(expected):
     string = sys.stdout.getvalue()
-    assert_equals(string, expected)
+    assert_equal(string, expected)
 
 def test_ansify():
     "couleur.ansify wraps ansi code for proper pythonic output"
-    assert_equals(ansify(0), '\033[0m')
+    assert_equal(ansify(0), '\033[0m')
 
 @with_setup(prepare_stdout)
 def test_output_black_foreground():

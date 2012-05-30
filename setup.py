@@ -20,10 +20,15 @@ import sys
 
 extra = {}
 if sys.version_info >= (3,0):
-    u = str
+    u = lambda s: s.encode('utf-8')
     extra.update( use_2to3 = True )
+elif sys.version_info < (2, 6):
+    u = lambda s: s
 else:
     u = lambda s: unicode(s, 'utf8')
+
+if sys.version_info < (2, 5):
+    extra.update( install_requires = ['uuid'] )
 
 
 setup(name='couleur',
@@ -42,5 +47,8 @@ setup(name='couleur',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
     ],
+    setup_requires=['nose'],
+    tests_require=['nose'],
+    test_suite='nose.collector',
     **extra
 )

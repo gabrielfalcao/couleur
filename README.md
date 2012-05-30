@@ -4,6 +4,10 @@ __Version 0.3__
 __Couleur__ is a handy tool to play around with ANSI features in a
 unix terminal
 
+## status
+
+[![Build Status](https://secure.travis-ci.org/gabrielfalcao/couleur.png)](http://travis-ci.org/gabrielfalcao/couleur)
+
 ## installing
 
     user@machine:~$ sudo pip install git+git://github.com/gabrielfalcao/couleur.git
