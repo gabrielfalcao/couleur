@@ -16,10 +16,10 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from setuptools import setup
-from couleur import __version__
+from couleur import version
 
 setup(name='couleur',
-    version=__version__,
+    version=version,
     description=(u'ANSI terminal tool for python, colored shell and other '
                  'handy fancy features'),
     author='Gabriel Falcao',

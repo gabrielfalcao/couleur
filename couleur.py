@@ -20,7 +20,7 @@ import sys
 import uuid
 import platform
 
-__version__ = '0.4.0'
+version = '0.4.1'
 
 from StringIO import StringIO
 
