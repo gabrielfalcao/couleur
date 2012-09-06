@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # <Couleur - fancy shell output for python>
-# Copyright (C) <2010>  Gabriel Falcão <gabriel@nacaolivre.org>
+# Copyright (C) <2010-2012>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -20,7 +20,8 @@ import sys
 import uuid
 import platform
 
-__version__ = '0.3'
+__version__ = '0.4.0'
+
 from StringIO import StringIO
 
 
@@ -34,10 +35,11 @@ for handle in [sys.stdout, sys.stderr]:
         else:
             SUPPORTS_ANSI = True
 
-if os.getenv('SURE_NO_COLORS'):
+if os.getenv('COULEUR_DISABLE'):
     SUPPORTS_ANSI = False
 
-SUPPORTS_ANSI = False
+if os.getenv('FORCE_COULEUR'):
+    SUPPORTS_ANSI = True
 
 
 def minify(string):
@@ -213,20 +215,22 @@ _sep2 = '_and_'
 
 
 class Shell(object):
-    def __init__(self, indent=2, linebreak=False, bold=False, disabled=False):
+    def __init__(self, indent=2, linebreak=False, bold=False,
+                 disabled=not SUPPORTS_ANSI):
         self._indentation_factor = indent
         self._indent = 0
         self._linebreak = linebreak
         self._bold = bold
         self._in_format = False
         self._disabled = disabled
-        self._backcolors = backcolors()
-        self._forecolors = forecolors()
-        self._modifiers = modifiers()
-        if disabled or not SUPPORTS_ANSI:
+        if disabled:
             self._backcolors = empty()
             self._forecolors = empty()
             self._modifiers = empty()
+        else:
+            self._backcolors = backcolors()
+            self._forecolors = forecolors()
+            self._modifiers = modifiers()
 
     def indent(self):
         self._indent += self._indentation_factor

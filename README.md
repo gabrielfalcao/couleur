@@ -126,7 +126,8 @@ You will need to install [nose](http://somethingaboutorange.com/mrl/projects/nos
 And run:
     user@machine:~/Projects$ git clone git://github.com/gabrielfalcao/couleur.git
     user@machine:~/Projects$ cd couleur
-    user@machine:~/Projects/couleur$ nosetests
+    user@machine:~/Projects$ pip install -r requirements.pip
+    user@machine:~/Projects/couleur$ make
 
 ## nomenclature
 
