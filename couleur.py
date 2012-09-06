@@ -61,16 +61,16 @@ def minify(string):
 def translate_colors(string):
     for attr in re.findall("[#][{]on[:](\w+)[}]", string):
         string = string.replace(
-            "#{on:%s}" % attr,
+            u"#{on:%s}" % unicode(attr),
             getattr(backcolors, attr)
         )
 
     for attr in re.findall("[#][{](\w+)[}]", string):
         string = string.replace(
-            "#{%s}" % attr,
+            u"#{%s}" % unicode(attr),
             getattr(forecolors, attr, "#{%s}" % attr)
         ).replace(
-            "#{%s}" % attr,
+            u"#{%s}" % unicode(attr),
             getattr(modifiers, attr, "#{%s}" % attr)
         )
 
@@ -86,11 +86,12 @@ def ignore_colors(string):
     string = up_supress_regex.sub('\g<start>', string)
 
     for attr in re.findall("[#][{]on[:](\w+)[}]", string):
-        string = string.replace("#{on:%s}" % attr, "")
+        string = string.replace(u"#{on:%s}" % unicode(attr), u"")
 
     for attr in re.findall("[#][{](\w+)[}]", string):
-        string = string.replace("#{%s}" % attr, "") \
-             .replace("#{%s}" % attr, "")
+        string = (string
+                  .replace(u"#{%s}" % unicode(attr), u"")
+                  .replace(u"#{%s}" % unicode(attr), u""))
 
     return string
 
@@ -165,7 +166,7 @@ def ansify(number):
     - `number`: the code in question
     """
     number = unicode(number)
-    return '\033[%sm' % number
+    return u'\033[%sm' % number
 
 
 class modifiers:
@@ -176,7 +177,7 @@ class modifiers:
     underline = ansify(4)
     inverse = ansify(7)
     strikethrough = ansify(9)
-    up = '\r\033[A'
+    up = u'\r\033[A'
 
 
 class forecolors:
@@ -206,12 +207,12 @@ class backcolors:
 class empty(object):
     def __getattr__(self, attr):
         if attr != 'up':
-            return ''
+            return u''
         else:
             return modifiers.up
 
-_sep1 = '_on_'
-_sep2 = '_and_'
+_sep1 = u'_on_'
+_sep2 = u'_and_'
 
 
 class Shell(object):
@@ -246,8 +247,8 @@ class Shell(object):
                 r = getattr(self._forecolors, what)
             return r
 
-        args = map(get, color.split("_"))
-        return "".join(args)
+        args = map(get, color.split(u"_"))
+        return u"".join(args)
 
     def _back(self, color):
         return getattr(self._backcolors, color)
@@ -257,7 +258,7 @@ class Shell(object):
 
         parts = [
             self._fore(colors.pop(0)),
-            "%s",
+            u"%s",
             self._modifiers.reset
         ]
 
@@ -269,43 +270,44 @@ class Shell(object):
                 parts.insert(0, self._modifiers.bold)
 
             if self._indent:
-                parts.insert(0, ' ' * self._indent)
+                parts.insert(0, u' ' * self._indent)
 
             if self._linebreak:
-                parts.append("\n")
+                parts.append(u"\n")
 
-        string = "".join(parts)
+        string = u"".join(map(unicode, parts))
 
         def dec(z, replace=False):
-            pre = (replace and self._modifiers.up or '')
-            sys.stdout.write(pre + (string % z))
+            pre = unicode(replace and self._modifiers.up or u'')
+            sys.stdout.write(pre)
+            sys.stdout.write(string % unicode(z.decode('utf-8')))
 
         return dec
 
     def __getattr__(self, attr):
-        if not attr.startswith("_"):
+        if not attr.startswith(u"_"):
             if _sep2 in attr:
                 self._in_format = True
                 printers = map(self._printer_for, attr.split(_sep2))
 
                 def dec(string, replace=False):
                     unique = str(uuid.uuid4())
-                    string = string.replace(r'\|', unique)
-                    parts = string.split("|")
+                    string = string.replace(ur'\|', unique)
+                    parts = string.split(ur"|")
                     if replace:
                         sys.stdout.write(self._modifiers.up)
 
                     if self._indent:
-                        sys.stdout.write(' ' * self._indent)
+                        sys.stdout.write(u' ' * self._indent)
 
                     if self._bold:
                         sys.stdout.write(self._modifiers.bold)
 
                     for part, output in zip(parts, printers):
-                        output(part.replace(unique, "|"))
+                        output(part.replace(unique, ur"|"))
 
                     if self._linebreak:
-                        sys.stdout.write("\n")
+                        sys.stdout.write(u"\n")
 
                     self._in_format = False
 
