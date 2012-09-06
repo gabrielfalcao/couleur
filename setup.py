@@ -15,8 +15,20 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from setuptools import setup
+import os
 from couleur import version
+from setuptools import setup
+
+
+def get_packages():
+    # setuptools can't do the job :(
+    packages = []
+    for root, dirnames, filenames in os.walk('couleur'):
+        if '__init__.py' in filenames:
+            packages.append(".".join(os.path.split(root)).strip("."))
+
+    return packages
+
 
 setup(name='couleur',
     version=version,
@@ -25,7 +37,7 @@ setup(name='couleur',
     author='Gabriel Falcao',
     author_email='gabriel@nacaolivre.org',
     url='http://github.com/gabrielfalcao/couleur',
-    py_modules=['couleur'],
+    packages=get_packages(),
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: Apache Software License',
