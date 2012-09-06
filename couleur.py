@@ -14,11 +14,31 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import os
 import re
 import sys
 import uuid
+import platform
+
 __version__ = '0.3'
 from StringIO import StringIO
+
+
+SUPPORTS_ANSI = False
+for handle in [sys.stdout, sys.stderr]:
+    if (hasattr(handle, "isatty") and handle.isatty()) or \
+        ('TERM' in os.environ and os.environ['TERM'] == 'ANSI'):
+        if platform.system() == 'Windows' and not (
+            'TERM' in os.environ and os.environ['TERM'] == 'ANSI'):
+            SUPPORTS_ANSI = False
+        else:
+            SUPPORTS_ANSI = True
+
+if os.getenv('SURE_NO_COLORS'):
+    SUPPORTS_ANSI = False
+
+SUPPORTS_ANSI = False
+
 
 def minify(string):
     regex_items = re.compile('(\033\[(\d+)m)')
@@ -34,6 +54,7 @@ def minify(string):
             replaced = string.replace(existent, '\033[%sm' % found)
 
     return replaced
+
 
 def translate_colors(string):
     for attr in re.findall("[#][{]on[:](\w+)[}]", string):
@@ -53,6 +74,7 @@ def translate_colors(string):
 
     return minify(string)
 
+
 def ignore_colors(string):
     up_count_regex = re.compile(ur'[#][{]up[}]')
     up_count = len(up_count_regex.findall(string)) or 1
@@ -70,18 +92,23 @@ def ignore_colors(string):
 
     return string
 
+
 class Writer(StringIO):
     original = None
     translate = True
+
     def write(self, string):
         f = self.translate and translate_colors or ignore_colors
         self.original.write(f(string))
 
+
 class StdOutMocker(Writer):
     original = sys.__stdout__
 
+
 class StdErrMocker(Writer):
     original = sys.__stderr__
+
 
 class Proxy(object):
     def __init__(self, output):
@@ -120,11 +147,14 @@ class Proxy(object):
             self.output.write = self.old_write
 
 _proxy_registry = {}
+
+
 def proxy(output):
     if output not in _proxy_registry.keys():
         _proxy_registry[output] = Proxy(output)
 
     return _proxy_registry[output]
+
 
 def ansify(number):
     """Wraps the given ansi code to a proper escaped python output
@@ -135,6 +165,7 @@ def ansify(number):
     number = unicode(number)
     return '\033[%sm' % number
 
+
 class modifiers:
     reset = ansify(0)
     bold = ansify(1)
@@ -144,6 +175,7 @@ class modifiers:
     inverse = ansify(7)
     strikethrough = ansify(9)
     up = '\r\033[A'
+
 
 class forecolors:
     black = ansify(30)
@@ -156,6 +188,7 @@ class forecolors:
     white = ansify(37)
     normal = ansify(39)
 
+
 class backcolors:
     black = ansify(40)
     red = ansify(41)
@@ -167,6 +200,7 @@ class backcolors:
     white = ansify(47)
     normal = ansify(49)
 
+
 class empty(object):
     def __getattr__(self, attr):
         if attr != 'up':
@@ -176,6 +210,7 @@ class empty(object):
 
 _sep1 = '_on_'
 _sep2 = '_and_'
+
 
 class Shell(object):
     def __init__(self, indent=2, linebreak=False, bold=False, disabled=False):
@@ -188,7 +223,7 @@ class Shell(object):
         self._backcolors = backcolors()
         self._forecolors = forecolors()
         self._modifiers = modifiers()
-        if disabled:
+        if disabled or not SUPPORTS_ANSI:
             self._backcolors = empty()
             self._forecolors = empty()
             self._modifiers = empty()
@@ -198,7 +233,6 @@ class Shell(object):
 
     def dedent(self):
         self._indent -= self._indentation_factor
-
 
     def _fore(self, color):
         def get(what):
@@ -244,12 +278,12 @@ class Shell(object):
 
         return dec
 
-
     def __getattr__(self, attr):
         if not attr.startswith("_"):
             if _sep2 in attr:
                 self._in_format = True
                 printers = map(self._printer_for, attr.split(_sep2))
+
                 def dec(string, replace=False):
                     unique = str(uuid.uuid4())
                     string = string.replace(r'\|', unique)
