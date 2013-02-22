@@ -16,154 +16,170 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
 from StringIO import StringIO
-from nose.tools import with_setup, assert_equals
-
-from couleur import ansify
+from sure import scenario, action_for, expect
 from couleur import Shell
 
-def prepare_stdout():
-    if isinstance(sys.stdout, StringIO):
-        del sys.stdout
 
-    std = StringIO()
-    sys.stdout = std
+def prepare_output_stream(context):
+    context.output = StringIO()
 
-def assert_stdout(expected):
-    string = sys.stdout.getvalue()
-    assert_equals(string, expected)
+    @action_for(context, provides=['check_output'])
+    def check_output(expected):
+        context.output.getvalue().should.equal(expected)
 
-def test_ansify():
-    "couleur.ansify wraps ansi code for proper pythonic output"
-    assert_equals(ansify(0), '\033[0m')
+    @action_for(context, provides=['check_output'])
+    def make_shell(*args, **kw):
+        context.sh = Shell(context.output, *args, **kw)
 
-@with_setup(prepare_stdout)
-def test_output_black_foreground():
+
+def test_default_output():
+    "Shell.output should default to sys.stdout"
+    sh = Shell()
+    expect(sh.output).to.equal(sys.stdout)
+
+
+@scenario(prepare_output_stream)
+def test_output_black_foreground(spec):
     "Test output: black foreground"
-    sh = Shell()
-    sh.black("Hello Black!")
-    assert_stdout('\033[30mHello Black!\033[0m')
+    spec.make_shell()
+    spec.sh.black("Hello Black!")
+    spec.check_output('\033[30mHello Black!\033[0m')
 
-@with_setup(prepare_stdout)
-def test_output_black_foreground_on_white_background():
+
+@scenario(prepare_output_stream)
+def test_output_black_foreground_on_white_background(spec):
     "Test output: black foreground on white background"
-    sh = Shell()
-    sh.black_on_white("Hello Black!")
-    assert_stdout('\033[47m\033[30mHello Black!\033[0m')
+    spec.make_shell()
+    spec.sh.black_on_white("Hello Black!")
+    spec.check_output('\033[47m\033[30mHello Black!\033[0m')
 
-@with_setup(prepare_stdout)
-def test_output_green_foreground():
+
+@scenario(prepare_output_stream)
+def test_output_green_foreground(spec):
     "Test output: green foreground"
-    sh = Shell()
-    sh.green("Hello World!")
-    assert_stdout('\033[32mHello World!\033[0m')
+    spec.make_shell()
+    spec.sh.green("Hello World!")
+    spec.check_output('\033[32mHello World!\033[0m')
 
-@with_setup(prepare_stdout)
-def test_mixed_output():
+
+@scenario(prepare_output_stream)
+def test_mixed_output(spec):
     "green_and_red_and_white is a valid call"
-    sh = Shell()
-    sh.green_and_red_and_white("Hello |World |for you!")
-    assert_stdout(
+    spec.make_shell()
+    spec.sh.green_and_red_and_white("Hello |World |for you!")
+    spec.check_output(
         '\033[32mHello \033[0m\033[31mWorld \033[0m\033[37mfor you!\033[0m'
     )
 
-@with_setup(prepare_stdout)
-def test_mixed_output_with_escaped_separator():
+
+@scenario(prepare_output_stream)
+def test_mixed_output_with_escaped_separator(spec):
     "green_and_red_on_yellow works is a valid call"
-    sh = Shell()
-    sh.green_and_red_on_yellow("Hello |World \|for you!")
-    assert_stdout(
+    spec.make_shell()
+    spec.sh.green_and_red_on_yellow("Hello |World \|for you!")
+    spec.check_output(
         '\033[32mHello \033[0m\033[43m\033[31mWorld |for you!\033[0m'
     )
 
-@with_setup(prepare_stdout)
-def test_mixed_output_with_backgrounds():
+
+@scenario(prepare_output_stream)
+def test_mixed_output_with_backgrounds(spec):
     "green_on_magenta_and_red_and_white_on_blue is a valid call"
-    sh = Shell()
-    sh.green_on_magenta_and_red_and_white_on_blue("Hello |World |for you!")
-    assert_stdout('\033[45m\033[32mHello \033[0m\033[31mWorld \033[0m\033[44m\033[37mfor you!\033[0m'
+    spec.make_shell()
+    spec.sh.green_on_magenta_and_red_and_white_on_blue("Hello |World |for you!")
+    spec.check_output('\033[45m\033[32mHello \033[0m\033[31mWorld \033[0m\033[44m\033[37mfor you!\033[0m'
     )
 
-@with_setup(prepare_stdout)
-def test_indent():
+
+@scenario(prepare_output_stream)
+def test_indent(spec):
     "indentation"
-    sh = Shell(indent=4, linebreak=True)
-    sh.normal_on_blue("Hello")
-    sh.indent()
-    sh.normal_on_red("World")
-    assert_stdout('\033[44m\033[39mHello\033[0m\n    \033[41m\033[39mWorld\033[0m\n')
+    spec.make_shell(indent=4, linebreak=True)
+    spec.sh.normal_on_blue("Hello")
+    spec.sh.indent()
+    spec.sh.normal_on_red("World")
+    spec.check_output('\033[44m\033[39mHello\033[0m\n    \033[41m\033[39mWorld\033[0m\n')
 
-@with_setup(prepare_stdout)
-def test_dedent():
+
+@scenario(prepare_output_stream)
+def test_dedent(spec):
     "de-indentation"
-    sh = Shell(indent=4, linebreak=True)
-    sh.indent()
-    sh.normal_on_blue("Hello")
-    sh.dedent()
-    sh.normal_on_red("World")
-    assert_stdout('    \033[44m\033[39mHello\033[0m\n\033[41m\033[39mWorld\033[0m\n')
+    spec.make_shell(indent=4, linebreak=True)
+    spec.sh.indent()
+    spec.sh.normal_on_blue("Hello")
+    spec.sh.dedent()
+    spec.sh.normal_on_red("World")
+    spec.check_output('    \033[44m\033[39mHello\033[0m\n\033[41m\033[39mWorld\033[0m\n')
 
-@with_setup(prepare_stdout)
-def test_bold():
+
+@scenario(prepare_output_stream)
+def test_bold(spec):
     "bold text"
-    sh = Shell(bold=True)
-    sh.normal_on_blue("Hello")
-    sh.normal_on_red("World")
-    assert_stdout('\033[1m\033[44m\033[39mHello\033[0m\033[1m\033[41m\033[39mWorld\033[0m')
+    spec.make_shell(bold=True)
+    spec.sh.normal_on_blue("Hello")
+    spec.sh.normal_on_red("World")
+    spec.check_output('\033[1m\033[44m\033[39mHello\033[0m\033[1m\033[41m\033[39mWorld\033[0m')
 
-@with_setup(prepare_stdout)
-def test_bold_inline():
+
+@scenario(prepare_output_stream)
+def test_bold_inline(spec):
     "bold text with inline call"
-    sh = Shell()
-    sh.bold_normal_on_blue("Hello")
-    sh.bold_normal_on_red("World")
-    assert_stdout('\033[44m\033[1m\033[39mHello\033[0m\033[41m\033[1m\033[39mWorld\033[0m')
+    spec.make_shell()
+    spec.sh.bold_normal_on_blue("Hello")
+    spec.sh.bold_normal_on_red("World")
+    spec.check_output('\033[44m\033[1m\033[39mHello\033[0m\033[41m\033[1m\033[39mWorld\033[0m')
 
-@with_setup(prepare_stdout)
-def test_update_shell():
+
+@scenario(prepare_output_stream)
+def test_update_shell(spec):
     "updating the shell, replacing the last output"
-    sh = Shell(indent=6)
-    sh.yellow("Yellow")
-    sh.indent()
-    sh.red("Red", True)
-    assert_stdout('\033[33mYellow\033[0m\r\033[A      \033[31mRed\033[0m')
+    spec.make_shell(indent=6)
+    spec.sh.yellow("Yellow")
+    spec.sh.indent()
+    spec.sh.red("Red", True)
+    spec.check_output('\033[33mYellow\033[0m\r\033[A      \033[31mRed\033[0m')
 
-@with_setup(prepare_stdout)
-def test_update_shell_mixed_with_linebreak():
+
+@scenario(prepare_output_stream)
+def test_update_shell_mixed_with_linebreak(spec):
     "updating the shell with mixed output and linebreak enabled"
-    sh = Shell(linebreak=True)
-    sh.yellow("Yellow")
-    sh.yellow_and_normal_and_red("Yellow| and |Red", True)
-    sh.green("Green")
-    assert_stdout('\033[33mYellow\033[0m\n\r\033[A\033[33mYellow\033[0m\033[39m and \033[0m\033[31mRed\033[0m\n\033[32mGreen\033[0m\n')
+    spec.make_shell(linebreak=True)
+    spec.sh.yellow("Yellow")
+    spec.sh.yellow_and_normal_and_red("Yellow| and |Red", True)
+    spec.sh.green("Green")
+    spec.check_output('\033[33mYellow\033[0m\n\r\033[A\033[33mYellow\033[0m\033[39m and \033[0m\033[31mRed\033[0m\n\033[32mGreen\033[0m\n')
 
-@with_setup(prepare_stdout)
-def test_update_shell_mixed_with_indentation():
+
+@scenario(prepare_output_stream)
+def test_update_shell_mixed_with_indentation(spec):
     "updating the shell with mixed output and indentation"
-    sh = Shell(linebreak=True)
-    sh.yellow("Yellow")
-    sh.indent()
-    sh.yellow_and_normal_and_red("Yellow| and |Red", True)
-    sh.dedent()
-    sh.green("Green")
-    assert_stdout('\033[33mYellow\033[0m\n\r\033[A  \033[33mYellow\033[0m\033[39m and \033[0m\033[31mRed\033[0m\n\033[32mGreen\033[0m\n')
+    spec.make_shell(linebreak=True)
+    spec.sh.yellow("Yellow")
+    spec.sh.indent()
+    spec.sh.yellow_and_normal_and_red("Yellow| and |Red", True)
+    spec.sh.dedent()
+    spec.sh.green("Green")
+    spec.check_output('\033[33mYellow\033[0m\n\r\033[A  \033[33mYellow\033[0m\033[39m and \033[0m\033[31mRed\033[0m\n\033[32mGreen\033[0m\n')
 
-@with_setup(prepare_stdout)
-def test_update_shell_mixed_with_bold():
+
+@scenario(prepare_output_stream)
+def test_update_shell_mixed_with_bold(spec):
     "updating the shell with mixed output and bold enabled"
-    sh = Shell(bold=True)
-    sh.yellow("Yellow")
-    sh.yellow_and_normal_and_red("Yellow| and |Red", True)
-    sh.green("Green")
-    assert_stdout('\033[1m\033[33mYellow\033[0m\r\033[A\033[1m\033[33mYellow\033[0m\033[39m and \033[0m\033[31mRed\033[0m\033[1m\033[32mGreen\033[0m')
+    spec.make_shell(bold=True)
+    spec.sh.yellow("Yellow")
+    spec.sh.yellow_and_normal_and_red("Yellow| and |Red", True)
+    spec.sh.green("Green")
+    spec.check_output('\033[1m\033[33mYellow\033[0m\r\033[A\033[1m\033[33mYellow\033[0m\033[39m and \033[0m\033[31mRed\033[0m\033[1m\033[32mGreen\033[0m')
 
-@with_setup(prepare_stdout)
-def test_dont_print_colors_if_set_as_disabled():
+
+@scenario(prepare_output_stream)
+def test_dont_print_colors_if_set_as_disabled(spec):
     "disable colors"
-    sh = Shell(disabled=True, linebreak=True, bold=True)
-    sh.yellow("Yellow")
-    sh.indent()
-    sh.indent()
-    sh.yellow_and_red_on_yellow("Yellow| and Red", True)
-    sh.dedent()
-    sh.green("Green")
-    assert_stdout('Yellow\n\r\033[A    Yellow and Red\n  Green\n')
+    spec.make_shell(disabled=True, linebreak=True, bold=True)
+    spec.sh.yellow("Yellow")
+    spec.sh.indent()
+    spec.sh.indent()
+    spec.sh.yellow_and_red_on_yellow("Yellow| and Red", True)
+    spec.sh.dedent()
+    spec.sh.green("Green")
+    spec.check_output('Yellow\n\r\033[A    Yellow and Red\n  Green\n')

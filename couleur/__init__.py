@@ -216,7 +216,7 @@ _sep2 = u'_and_'
 
 
 class Shell(object):
-    def __init__(self, indent=2, linebreak=False, bold=False,
+    def __init__(self, output=None, indent=2, linebreak=False, bold=False,
                  disabled=not SUPPORTS_ANSI):
         self._indentation_factor = indent
         self._indent = 0
@@ -224,6 +224,8 @@ class Shell(object):
         self._bold = bold
         self._in_format = False
         self._disabled = disabled
+        self.output = output or sys.stdout
+
         if disabled:
             self._backcolors = empty()
             self._forecolors = empty()
@@ -279,8 +281,8 @@ class Shell(object):
 
         def dec(z, replace=False):
             pre = unicode(replace and self._modifiers.up or u'')
-            sys.stdout.write(pre)
-            sys.stdout.write(string % unicode(z.decode('utf-8')))
+            self.output.write(pre)
+            self.output.write(string % unicode(z.decode('utf-8')))
 
         return dec
 
@@ -295,19 +297,19 @@ class Shell(object):
                     string = string.replace(ur'\|', unique)
                     parts = string.split(ur"|")
                     if replace:
-                        sys.stdout.write(self._modifiers.up)
+                        self.output.write(self._modifiers.up)
 
                     if self._indent:
-                        sys.stdout.write(u' ' * self._indent)
+                        self.output.write(u' ' * self._indent)
 
                     if self._bold:
-                        sys.stdout.write(self._modifiers.bold)
+                        self.output.write(self._modifiers.bold)
 
                     for part, output in zip(parts, printers):
                         output(part.replace(unique, ur"|"))
 
                     if self._linebreak:
-                        sys.stdout.write(u"\n")
+                        self.output.write(u"\n")
 
                     self._in_format = False
 

@@ -22,61 +22,71 @@ unix terminal
 
 #### further
 
-    >>> import sys, couleur
+```python
+import sys, couleur
 
-    >>> couleur.proxy(sys.stdout).enable()
+couleur.proxy(sys.stdout).enable()
+print "#{bold}#{blue}#{on:black}This is#{normal} a test"
+couleur.proxy(sys.stdout).ignore()
 
-    >>> print "#{bold}#{red}#{on:yellow}This is#{normal} a test"
-    u'\x1b[1;31;43mThis is\x1b[39m a test'
-
-    >>> couleur.proxy(sys.stdout).ignore()
-
-    >>> print "#{bold}#{red}#{on:yellow}This is#{normal} a test"
-    u'This is a test'
-
-    >>> couleur.proxy(sys.stdout).disable()
+print "#{green}#{on:black}This is#{normal} a test"
+couleur.proxy(sys.stdout).disable()
+```
 
 ### dynamic methods
 
 couleur has a syntax sugar that is semantically nice:
 
-    import couleur
-    sh = couleur.Shell(indent=4)
+```python
+import couleur
+sh = couleur.Shell(indent=4)
 
-    sh.bold_black_on_white('Nice highlight')
-    # prints '\033[47m\033[1m\033[30mNice highlight\033[0m'
+sh.bold_black_on_white('Nice highlight')
+# prints '\033[47m\033[1m\033[30mNice highlight\033[0m'
 
-    sh.indent()
-    # will increase a internal indentation factor in couleur.Shell instance
+sh.indent()
+# will increase a internal indentation factor in couleur.Shell instance
 
-    sh.green('Just green')
-    # prints indented as well '    \033[32mJust Green\033[0m'
+sh.green('Just green')
+# prints indented as well '    \033[32mJust Green\033[0m'
 
-    sh.dedent()
-    # will decrease that indentation factor (above)
+sh.dedent()
+# will decrease that indentation factor (above)
 
-    # syntax sugar
-    sh.green_and_nornal_and_blue('this will be printed in green| and |this in blue')
-    # see: '\033[32mthis will be printed in green\033[0m and \033[34mthis in blue\033[0m'
+# syntax sugar
+sh.green_and_normal_and_blue('this will be printed in green| and |this in blue')
+# see: '\033[32mthis will be printed in green\033[0m and \033[34mthis in blue\033[0m'
+```
 
 couleur can overwrite output, so that you can make things like printing progress bars, show percentage and so on:
 
-    #!/usr/bin/env python
-    # -*- coding: utf-8 -*-
+```python
+import time
+import couleur
 
-    import time
-    import couleur
+shell = couleur.Shell(linebreak=True, bold=True)
 
-    shell = couleur.Shell(linebreak=True, bold=True)
+for num in range(101):
+    if num == 0:
+        print
 
-    for num in range(101):
-        if num == 0:
-            print
+    shell.yellow_and_red("Downloading file: |%d%%" % num, replace=True)
+    time.sleep(0.01)
 
-        shell.yellow_and_red("Downloading file: |%d%%" % num, replace=True)
-        time.sleep(0.05)
+shell.white_and_green("Downloading file: |DONE!", replace=True)
+```
 
-    shell.white_and_green("Downloading file: |DONE!", replace=True)
+#### Writing to other streams
+
+Simply pass the output as first argument of the `Shell`
+```python
+import couleur
+
+with open('output.log', 'w') as output:
+    shell = couleur.Shell(output, linebreak=True, bold=True)
+    shell.white_and_green("done with | Some task")
+```
+
 
 ### furthermore
 
@@ -107,13 +117,12 @@ Available colors:
 
 Example chaining modifiers:
 
-    #!/usr/bin/env python
-    # -*- coding: utf-8 -*-
+```python
+import couleur
 
-    import couleur
-
-    shell = couleur.Shell(linebreak=True)
-    shell.bold_italic_underline_yellow_on_black_and_italic_black_on_white("WOO| HOO")
+shell = couleur.Shell(linebreak=True)
+shell.bold_italic_underline_green_on_black_and_italic_black_on_white("WOO| HOO")
+```
 
 ## free software
 
@@ -124,10 +133,13 @@ To contribute back with this project, all you need to do is write code, and test
 You will need to install [nose](http://somethingaboutorange.com/mrl/projects/nose/0.11.3/ "a pretty way for testing in python").
 
 And run:
-    user@machine:~/Projects$ git clone git://github.com/gabrielfalcao/couleur.git
-    user@machine:~/Projects$ cd couleur
-    user@machine:~/Projects$ pip install -r requirements.pip
-    user@machine:~/Projects/couleur$ make
+
+```shell
+user@machine:~/Projects$ git clone git://github.com/gabrielfalcao/couleur.git
+user@machine:~/Projects$ cd couleur
+user@machine:~/Projects$ pip install -r requirements.pip
+user@machine:~/Projects/couleur$ make
+```
 
 ## nomenclature
 
@@ -135,6 +147,6 @@ And run:
 
 ## Licensing
 
-    Copyright (c) 2010 Gabriel Falcão
+    Copyright (c) 2010-2013 Gabriel Falcão
     Licensed under Apache License 2.0
     http://www.apache.org/licenses/LICENSE-2.0.html
