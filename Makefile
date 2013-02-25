@@ -10,6 +10,7 @@ install_deps:
 
 test:
 	@nosetests --verbosity=2
+	@steadymark README.md
 
 clean:
 	@printf "Cleaning up files that are already in .gitignore... "
