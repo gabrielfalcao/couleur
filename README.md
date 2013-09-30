@@ -150,3 +150,7 @@ user@machine:~/Projects/couleur$ make
     Copyright (c) 2010-2013 Gabriel Falcão
     Licensed under Apache License 2.0
     http://www.apache.org/licenses/LICENSE-2.0.html
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/gabrielfalcao/couleur/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
