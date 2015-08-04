@@ -1,4 +1,4 @@
-distribute==0.6.27
+distribute==0.7.3
 nose==1.2.1
-steadymark==0.4.5
+steadymark==0.5.4
 sure==1.1.7

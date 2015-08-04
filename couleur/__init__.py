@@ -282,7 +282,7 @@ class Shell(object):
         def dec(z, replace=False):
             pre = str(replace and self._modifiers.up or '')
             self.output.write(pre)
-            self.output.write(string % str(z.decode('utf-8')))
+            self.output.write(string % str(z))
 
         return dec
 
