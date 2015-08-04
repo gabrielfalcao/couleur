@@ -19,10 +19,11 @@ import re
 import sys
 import uuid
 import platform
+import six
 
 version = '0.5.0'
 
-from StringIO import StringIO
+from six import StringIO
 
 
 SUPPORTS_ANSI = False
@@ -57,20 +58,29 @@ def minify(string):
 
     return replaced
 
+def maybe_unicode(text):
+    try:
+        text = six.u(text)
+    except TypeError:
+        True
+    finally:
+        return text
+
 
 def translate_colors(string):
+    string = maybe_unicode(string)
     for attr in re.findall("[#][{]on[:](\w+)[}]", string):
         string = string.replace(
-            u"#{on:%s}" % unicode(attr),
+            six.u("#{on:%s}") % attr,
             getattr(backcolors, attr)
         )
 
     for attr in re.findall("[#][{](\w+)[}]", string):
         string = string.replace(
-            u"#{%s}" % unicode(attr),
+            six.u("#{%s}") % attr,
             getattr(forecolors, attr, "#{%s}" % attr)
         ).replace(
-            u"#{%s}" % unicode(attr),
+            six.u("#{%s}") % attr,
             getattr(modifiers, attr, "#{%s}" % attr)
         )
 
@@ -78,20 +88,21 @@ def translate_colors(string):
 
 
 def ignore_colors(string):
-    up_count_regex = re.compile(ur'[#][{]up[}]')
+    string = maybe_unicode(string)
+    up_count_regex = re.compile(r'[#][{]up[}]')
     up_count = len(up_count_regex.findall(string)) or 1
 
-    expression = u'^(?P<start>.*)([#][{]up[}])+(.*\\n){%d}' % up_count
+    expression = six.u('^(?P<start>.*)([#][{]up[}])+(.*\\n){%d}') % up_count
     up_supress_regex = re.compile(expression, re.MULTILINE)
     string = up_supress_regex.sub('\g<start>', string)
 
     for attr in re.findall("[#][{]on[:](\w+)[}]", string):
-        string = string.replace(u"#{on:%s}" % unicode(attr), u"")
+        string = string.replace(six.u("#{on:%s}") % attr, six.u(""))
 
     for attr in re.findall("[#][{](\w+)[}]", string):
         string = (string
-                  .replace(u"#{%s}" % unicode(attr), u"")
-                  .replace(u"#{%s}" % unicode(attr), u""))
+                  .replace(six.u("#{%s}") % attr, six.u(""))
+                  .replace(six.u("#{%s}") % attr, six.u("")))
 
     return string
 
@@ -165,8 +176,8 @@ def ansify(number):
     Arguments:
     - `number`: the code in question
     """
-    number = unicode(number)
-    return u'\033[%sm' % number
+    number = str(number)
+    return '\033[%sm' % number
 
 
 class modifiers:
@@ -177,7 +188,7 @@ class modifiers:
     underline = ansify(4)
     inverse = ansify(7)
     strikethrough = ansify(9)
-    up = u'\r\033[A'
+    up = '\r\033[A'
 
 
 class forecolors:
@@ -207,12 +218,12 @@ class backcolors:
 class empty(object):
     def __getattr__(self, attr):
         if attr != 'up':
-            return u''
+            return ''
         else:
             return modifiers.up
 
-_sep1 = u'_on_'
-_sep2 = u'_and_'
+_sep1 = '_on_'
+_sep2 = '_and_'
 
 
 class Shell(object):
@@ -249,8 +260,8 @@ class Shell(object):
                 r = getattr(self._forecolors, what)
             return r
 
-        args = map(get, color.split(u"_"))
-        return u"".join(args)
+        args = list(map(get, color.split("_")))
+        return "".join(args)
 
     def _back(self, color):
         return getattr(self._backcolors, color)
@@ -260,7 +271,7 @@ class Shell(object):
 
         parts = [
             self._fore(colors.pop(0)),
-            u"%s",
+            "%s",
             self._modifiers.reset
         ]
 
@@ -272,44 +283,44 @@ class Shell(object):
                 parts.insert(0, self._modifiers.bold)
 
             if self._indent:
-                parts.insert(0, u' ' * self._indent)
+                parts.insert(0, ' ' * self._indent)
 
             if self._linebreak:
-                parts.append(u"\n")
+                parts.append("\n")
 
-        string = u"".join(map(unicode, parts))
+        string = "".join(map(str, parts))
 
         def dec(z, replace=False):
-            pre = unicode(replace and self._modifiers.up or u'')
-            self.output.write(pre)
-            self.output.write(string % unicode(z.decode('utf-8')))
+            pre = six.u(replace and self._modifiers.up or '')
+            self.output.write(maybe_unicode(pre))
+            self.output.write(maybe_unicode(string % z))
 
         return dec
 
     def __getattr__(self, attr):
-        if not attr.startswith(u"_"):
+        if not attr.startswith("_"):
             if _sep2 in attr:
                 self._in_format = True
-                printers = map(self._printer_for, attr.split(_sep2))
+                printers = list(map(self._printer_for, attr.split(_sep2)))
 
                 def dec(string, replace=False):
                     unique = str(uuid.uuid4())
-                    string = string.replace(ur'\|', unique)
-                    parts = string.split(ur"|")
+                    string = string.replace(r'\|', unique)
+                    parts = string.split(r"|")
                     if replace:
-                        self.output.write(self._modifiers.up)
+                        self.output.write(six.u(self._modifiers.up))
 
                     if self._indent:
-                        self.output.write(u' ' * self._indent)
+                        self.output.write(six.u(' ') * self._indent)
 
                     if self._bold:
-                        self.output.write(self._modifiers.bold)
+                        self.output.write(six.u(self._modifiers.bold))
 
                     for part, output in zip(parts, printers):
-                        output(part.replace(unique, ur"|"))
+                        output(part.replace(unique, r"|"))
 
                     if self._linebreak:
-                        self.output.write(u"\n")
+                        self.output.write(six.u("\n"))
 
                     self._in_format = False
 
