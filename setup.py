@@ -32,17 +32,21 @@ def get_packages():
 
 setup(name='couleur',
     version=version,
-    description=(u'ANSI terminal tool for python, colored shell and other '
+    description=('ANSI terminal tool for python, colored shell and other '
                  'handy fancy features'),
     author='Gabriel Falcao',
     author_email='gabriel@nacaolivre.org',
     url='http://github.com/gabrielfalcao/couleur',
     packages=get_packages(),
+    install_requires=[
+        'six',
+    ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: Apache Software License',
         "Operating System :: POSIX",
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
     ],
 )

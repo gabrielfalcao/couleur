@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
-from StringIO import StringIO
+from six import StringIO
 from nose.tools import with_setup, assert_equals
 
 import couleur
