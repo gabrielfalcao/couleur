@@ -32,7 +32,7 @@ def get_packages():
 
 setup(name='couleur',
     version=version,
-    description=(u'ANSI terminal tool for python, colored shell and other '
+    description=('ANSI terminal tool for python, colored shell and other '
                  'handy fancy features'),
     author='Gabriel Falcao',
     author_email='gabriel@nacaolivre.org',
