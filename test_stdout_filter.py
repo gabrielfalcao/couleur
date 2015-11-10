@@ -100,3 +100,15 @@ def test_integration_with_stdout():
     assert sys.stdout is not sys.__stdout__
     couleur.proxy(sys.stdout).disable()
     assert sys.stdout is sys.__stdout__
+
+
+@with_setup(prepare_stdout)
+def test_output_different_delimiters():
+    "using square brackets as delimiters should work"
+
+    couleur.proxy(sys.stdout, delimiter=couleur.delimiters.SQUARE_BRACKETS).enable()
+    print "[black]Hello Black![reset]"
+    assert_stdout('\033[30mHello Black!\033[0m\n')
+    couleur.proxy(sys.stdout).disable()
+    print "[black]should not be translated"
+    assert_stdout('[black]should not be translated\n')
