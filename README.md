@@ -38,23 +38,25 @@ couleur.proxy(sys.stdout).disable()
 couleur has a syntax sugar that is semantically nice:
 
 ```python
+print
 import couleur
 sh = couleur.Shell(indent=4)
 
-sh.bold_black_on_white('Nice highlight')
+sh.bold_black_on_white('Nice highlight\n')
 # prints '\033[47m\033[1m\033[30mNice highlight\033[0m'
 
 sh.indent()
 # will increase a internal indentation factor in couleur.Shell instance
 
-sh.green('Just green')
-# prints indented as well '    \033[32mJust Green\033[0m'
+sh.red('Just red\n')
+# prints indented as well '    \033[32mJust Green\033[0m\n'
 
 sh.dedent()
+
 # will decrease that indentation factor (above)
 
 # syntax sugar
-sh.green_and_normal_and_blue('this will be printed in green| and |this in blue')
+sh.green_and_normal_and_blue('this will be printed in green| and |this in blue\n')
 # see: '\033[32mthis will be printed in green\033[0m and \033[34mthis in blue\033[0m'
 ```
 
@@ -71,7 +73,7 @@ for num in range(101):
         print
 
     shell.yellow_and_red("Downloading file: |%d%%" % num, replace=True)
-    time.sleep(0.01)
+    time.sleep(0.02)
 
 shell.white_and_green("Downloading file: |DONE!", replace=True)
 ```
@@ -137,7 +139,7 @@ And run:
 ```shell
 user@machine:~/Projects$ git clone git://github.com/gabrielfalcao/couleur.git
 user@machine:~/Projects$ cd couleur
-user@machine:~/Projects$ pip install -r requirements.pip
+user@machine:~/Projects$ pip install -r requirements.txt
 user@machine:~/Projects/couleur$ make
 ```
 
@@ -153,4 +155,3 @@ user@machine:~/Projects/couleur$ make
 
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/gabrielfalcao/couleur/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-

@@ -6,7 +6,8 @@ export PYTHONPATH:=  ${PWD}
 export FORCE_COULEUR:=  true
 
 install_deps:
-	@pip install -r requirements.pip
+	@pip install -r requirements.txt
+	@pip uninstall -y couleur
 
 test:
 	@nosetests --verbosity=2
