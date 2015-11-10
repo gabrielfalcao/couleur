@@ -20,6 +20,7 @@ from nose.tools import with_setup, assert_equals
 
 import couleur
 
+
 def prepare_stdout():
     if isinstance(sys.stdout, StringIO):
         del sys.stdout
@@ -27,11 +28,13 @@ def prepare_stdout():
     std = StringIO()
     sys.stdout = std
 
+
 def assert_stdout(expected):
     string = sys.stdout.getvalue()
     sys.stdout.seek(0)
     sys.stdout.truncate()
     assert_equals(string, expected)
+
 
 @with_setup(prepare_stdout)
 def test_output_black_foreground():
@@ -44,6 +47,7 @@ def test_output_black_foreground():
     print "#{black}should not be translated"
     assert_stdout('#{black}should not be translated\n')
 
+
 @with_setup(prepare_stdout)
 def test_output_black_on_white_foreground():
     "STDOUT filter output: black foreground on white background"
@@ -54,6 +58,7 @@ def test_output_black_on_white_foreground():
     couleur.proxy(sys.stdout).disable()
     print "#{black}should not be translated"
     assert_stdout('#{black}should not be translated\n')
+
 
 @with_setup(prepare_stdout)
 def test_output_green_foreground():
@@ -66,6 +71,7 @@ def test_output_green_foreground():
     print "#{black}should not be translated"
     assert_stdout('#{black}should not be translated\n')
 
+
 @with_setup(prepare_stdout)
 def test_output_green_and_red_on_white_foreground():
     "STDOUT filter output: green foreground and white on red background"
@@ -76,6 +82,7 @@ def test_output_green_and_red_on_white_foreground():
     couleur.proxy(sys.stdout).disable()
     print "#{black}should not be translated"
     assert_stdout('#{black}should not be translated\n')
+
 
 @with_setup(prepare_stdout)
 def test_output_stdout_ignoring_output():
@@ -91,6 +98,7 @@ def test_output_stdout_ignoring_output():
     couleur.proxy(sys.stdout).disable()
     print "#{black}should not be translated"
     assert_stdout('#{black}should not be translated\n')
+
 
 def test_integration_with_stdout():
     "STDOUT filter integration"
