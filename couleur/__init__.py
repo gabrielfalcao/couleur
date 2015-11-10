@@ -20,9 +20,14 @@ import sys
 import uuid
 import platform
 
-version = '0.5.0'
+version = '0.6.0'
 
 from StringIO import StringIO
+
+
+class delimiters:
+    DEFAULT = ("#{", "}")
+    SQUARE_BRACKETS = ("[", "]")
 
 
 SUPPORTS_ANSI = False
@@ -58,40 +63,59 @@ def minify(string):
     return replaced
 
 
-def translate_colors(string):
-    for attr in re.findall("[#][{]on[:](\w+)[}]", string):
+def wrapper_factory(delimiter):
+    delimiter_in, delimiter_out = delimiter
+
+    def wrap_escaped(middle_part):
+        din = "".join([r"[{0}]".format(d) for d in delimiter_in])
+        dout = "".join([r"[{0}]".format(d) for d in delimiter_out])
+        return r"".join([din, middle_part, dout])
+
+    def wrap_normal(middle_part):
+        return r"".join([delimiter_in, middle_part, delimiter_out])
+
+    return wrap_escaped, wrap_normal
+
+
+def translate_colors(string, delimiter):
+    wrap_escaped, wrap_normal = wrapper_factory(delimiter)
+
+    for attr in re.findall(wrap_escaped("on[:](\w+)"), string):
         string = string.replace(
-            u"#{on:%s}" % unicode(attr),
+            wrap_normal(u"on:%s") % unicode(attr),
             getattr(backcolors, attr)
         )
 
-    for attr in re.findall("[#][{](\w+)[}]", string):
+    for attr in re.findall(wrap_escaped("(\w+)"), string):
         string = string.replace(
-            u"#{%s}" % unicode(attr),
-            getattr(forecolors, attr, "#{%s}" % attr)
+            wrap_normal(u"%s") % unicode(attr),
+            getattr(forecolors, attr, wrap_normal("%s") % attr)
         ).replace(
-            u"#{%s}" % unicode(attr),
-            getattr(modifiers, attr, "#{%s}" % attr)
+            wrap_normal(u"%s") % unicode(attr),
+            getattr(modifiers, attr, wrap_normal("%s") % attr)
         )
 
     return minify(string)
 
 
-def ignore_colors(string):
-    up_count_regex = re.compile(ur'[#][{]up[}]')
+def ignore_colors(string, delimiter):
+    wrap_escaped, wrap_normal = wrapper_factory(delimiter)
+
+    up_count_regex = re.compile(wrap_escaped(ur'up'))
     up_count = len(up_count_regex.findall(string)) or 1
 
-    expression = u'^(?P<start>.*)([#][{]up[}])+(.*\\n){%d}' % up_count
+    expression = (u'^(?P<start>.*)(' + wrap_escaped('up') + u')(.*\\n){%d}') % up_count
     up_supress_regex = re.compile(expression, re.MULTILINE)
+
     string = up_supress_regex.sub('\g<start>', string)
 
-    for attr in re.findall("[#][{]on[:](\w+)[}]", string):
-        string = string.replace(u"#{on:%s}" % unicode(attr), u"")
+    for attr in re.findall(wrap_escaped("on[:](\w+)"), string):
+        string = string.replace(wrap_normal(u"on:%s") % unicode(attr), u"")
 
-    for attr in re.findall("[#][{](\w+)[}]", string):
+    for attr in re.findall(wrap_escaped("(\w+)"), string):
         string = (string
-                  .replace(u"#{%s}" % unicode(attr), u"")
-                  .replace(u"#{%s}" % unicode(attr), u""))
+                  .replace(wrap_normal(u"%s") % unicode(attr), u"")
+                  .replace(wrap_normal(u"%s") % unicode(attr), u""))
 
     return string
 
@@ -102,7 +126,7 @@ class Writer(StringIO):
 
     def write(self, string):
         f = self.translate and translate_colors or ignore_colors
-        self.original.write(f(string))
+        self.original.write(f(string, self.delimiter))
 
 
 class StdOutMocker(Writer):
@@ -114,21 +138,22 @@ class StdErrMocker(Writer):
 
 
 class Proxy(object):
-    def __init__(self, output):
+    def __init__(self, output, delimiter=delimiters.DEFAULT):
         self.old_write = output.write
+        self.delimiter = delimiter
 
         if output is sys.__stdout__:
-            output = StdOutMocker()
+            output = StdOutMocker(delimiter)
 
         elif output is sys.__stderr__:
-            output = StdErrMocker()
+            output = StdErrMocker(delimiter)
 
         self.output = output
 
     def ignore(self):
         self.output.translate = False
         if not isinstance(self.output, (StdErrMocker, StdOutMocker)):
-            self.output.write = lambda x: self.old_write(ignore_colors(x))
+            self.output.write = lambda x: self.old_write(ignore_colors(x, self.delimiter))
 
     def enable(self):
         self.disable()
@@ -139,7 +164,7 @@ class Proxy(object):
         elif isinstance(self.output, StdErrMocker):
             sys.stderr = self.output
         else:
-            self.output.write = lambda x: self.old_write(translate_colors(x))
+            self.output.write = lambda x: self.old_write(translate_colors(x, self.delimiter))
 
     def disable(self):
         if isinstance(self.output, StdOutMocker):
@@ -152,9 +177,9 @@ class Proxy(object):
 _proxy_registry = {}
 
 
-def proxy(output):
+def proxy(output, delimiter=delimiters.DEFAULT):
     if output not in _proxy_registry.keys():
-        _proxy_registry[output] = Proxy(output)
+        _proxy_registry[output] = Proxy(output, delimiter)
 
     return _proxy_registry[output]
 
