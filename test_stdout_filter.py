@@ -120,3 +120,19 @@ def test_output_different_delimiters():
     couleur.proxy(sys.stdout).disable()
     print "[black]should not be translated"
     assert_stdout('[black]should not be translated\n')
+
+
+@with_setup(prepare_stdout)
+def test_output_stdout_ignoring_output_square_brackets():
+    "STDOUT filter output: ignoring output"
+
+    couleur.proxy(sys.stdout, delimiter=couleur.delimiters.SQUARE_BRACKETS).enable()
+    couleur.proxy(sys.stdout, delimiter=couleur.delimiters.SQUARE_BRACKETS).ignore()
+    sys.stdout.write("[green]Hello [white][on:blue]World![reset]\n")
+    assert_stdout('Hello World!\n')
+    couleur.proxy(sys.stdout, delimiter=couleur.delimiters.SQUARE_BRACKETS).enable()
+    sys.stdout.write("[green]Hi There!\n")
+    assert_stdout('\033[32mHi There!\n')
+    couleur.proxy(sys.stdout, delimiter=couleur.delimiters.SQUARE_BRACKETS).disable()
+    sys.stdout.write("[black]should not be translated\n")
+    assert_stdout('[black]should not be translated\n')

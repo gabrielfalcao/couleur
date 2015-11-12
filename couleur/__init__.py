@@ -31,11 +31,11 @@ class delimiters:
 
 
 SUPPORTS_ANSI = False
+ANSI_OK = ('TERM' in os.environ and os.environ['TERM'] == 'ANSI')
+
 for handle in [sys.stdout, sys.stderr]:
-    if (hasattr(handle, "isatty") and handle.isatty()) or \
-        ('TERM' in os.environ and os.environ['TERM'] == 'ANSI'):
-        if platform.system() == 'Windows' and not (
-            'TERM' in os.environ and os.environ['TERM'] == 'ANSI'):
+    if (hasattr(handle, "isatty") and handle.isatty()) or ANSI_OK:
+        if platform.system() == 'Windows' and not ANSI_OK:
             SUPPORTS_ANSI = False
         else:
             SUPPORTS_ANSI = True
@@ -67,8 +67,8 @@ def wrapper_factory(delimiter):
     delimiter_in, delimiter_out = delimiter
 
     def wrap_escaped(middle_part):
-        din = "".join([r"[{0}]".format(d) for d in delimiter_in])
-        dout = "".join([r"[{0}]".format(d) for d in delimiter_out])
+        din = r"".join([r"\{0}".format(d) for d in delimiter_in])
+        dout = r"".join([r"\{0}".format(d) for d in delimiter_out])
         return r"".join([din, middle_part, dout])
 
     def wrap_normal(middle_part):
@@ -82,17 +82,17 @@ def translate_colors(string, delimiter):
 
     for attr in re.findall(wrap_escaped("on[:](\w+)"), string):
         string = string.replace(
-            wrap_normal(u"on:%s") % unicode(attr),
+            wrap_normal(u"on:" + unicode(attr)),
             getattr(backcolors, attr)
         )
 
     for attr in re.findall(wrap_escaped("(\w+)"), string):
         string = string.replace(
-            wrap_normal(u"%s") % unicode(attr),
-            getattr(forecolors, attr, wrap_normal("%s") % attr)
+            wrap_normal(attr),
+            getattr(forecolors, attr, wrap_normal(attr))
         ).replace(
-            wrap_normal(u"%s") % unicode(attr),
-            getattr(modifiers, attr, wrap_normal("%s") % attr)
+            wrap_normal(attr),
+            getattr(modifiers, attr, wrap_normal(attr))
         )
 
     return minify(string)
@@ -110,12 +110,12 @@ def ignore_colors(string, delimiter):
     string = up_supress_regex.sub('\g<start>', string)
 
     for attr in re.findall(wrap_escaped("on[:](\w+)"), string):
-        string = string.replace(wrap_normal(u"on:%s") % unicode(attr), u"")
+        string = string.replace(wrap_normal(u"on:" + unicode(attr)), u"")
 
     for attr in re.findall(wrap_escaped("(\w+)"), string):
         string = (string
-                  .replace(wrap_normal(u"%s") % unicode(attr), u"")
-                  .replace(wrap_normal(u"%s") % unicode(attr), u""))
+                  .replace(wrap_normal(attr), u"")
+                  .replace(wrap_normal(attr), u""))
 
     return string
 
@@ -123,6 +123,10 @@ def ignore_colors(string, delimiter):
 class Writer(StringIO):
     original = None
     translate = True
+
+    def __init__(self, delimiter=delimiters.DEFAULT):
+        self.delimiter = delimiter
+        StringIO.__init__(self)
 
     def write(self, string):
         f = self.translate and translate_colors or ignore_colors

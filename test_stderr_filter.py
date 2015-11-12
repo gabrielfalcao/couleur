@@ -20,6 +20,7 @@ from nose.tools import with_setup, assert_equals
 
 import couleur
 
+
 def prepare_stderr():
     if isinstance(sys.stderr, StringIO):
         del sys.stderr
@@ -27,11 +28,13 @@ def prepare_stderr():
     std = StringIO()
     sys.stderr = std
 
+
 def assert_stderr(expected):
     string = sys.stderr.getvalue()
     sys.stderr.seek(0)
     sys.stderr.truncate()
     assert_equals(string, expected)
+
 
 @with_setup(prepare_stderr)
 def test_output_black_foreground():
@@ -44,6 +47,7 @@ def test_output_black_foreground():
     sys.stderr.write("#{black}should not be translated\n")
     assert_stderr('#{black}should not be translated\n')
 
+
 @with_setup(prepare_stderr)
 def test_output_black_on_white_foreground():
     "STDERR filter output: black foreground on white background"
@@ -54,6 +58,7 @@ def test_output_black_on_white_foreground():
     couleur.proxy(sys.stderr).disable()
     sys.stderr.write("#{black}should not be translated\n")
     assert_stderr('#{black}should not be translated\n')
+
 
 @with_setup(prepare_stderr)
 def test_output_green_foreground():
@@ -66,6 +71,7 @@ def test_output_green_foreground():
     sys.stderr.write("#{black}should not be translated\n")
     assert_stderr('#{black}should not be translated\n')
 
+
 @with_setup(prepare_stderr)
 def test_output_green_and_red_on_white_foreground():
     "STDERR filter output: green foreground and white on red background"
@@ -77,9 +83,10 @@ def test_output_green_and_red_on_white_foreground():
     sys.stderr.write("#{black}should not be translated\n")
     assert_stderr('#{black}should not be translated\n')
 
+
 @with_setup(prepare_stderr)
-def test_errput_stderr_ignoring_errput():
-    "STDERR filter errput: ignoring output"
+def test_output_stderr_ignoring_output():
+    "STDERR filter output: ignoring output"
 
     couleur.proxy(sys.stderr).enable()
     couleur.proxy(sys.stderr).ignore()
@@ -92,6 +99,7 @@ def test_errput_stderr_ignoring_errput():
     sys.stderr.write("#{black}should not be translated\n")
     assert_stderr('#{black}should not be translated\n')
 
+
 def test_integration_with_stderr():
     "STDERR filter integration"
 
@@ -100,3 +108,19 @@ def test_integration_with_stderr():
     assert sys.stderr is not sys.__stderr__
     couleur.proxy(sys.stderr).disable()
     assert sys.stderr is sys.__stderr__
+
+
+@with_setup(prepare_stderr)
+def test_output_stderr_ignoring_output_square_brackets():
+    "STDERR filter output: ignoring output"
+
+    couleur.proxy(sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).enable()
+    couleur.proxy(sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).ignore()
+    sys.stderr.write("[green]Hello [white][on:blue]World![reset]\n")
+    assert_stderr('Hello World!\n')
+    couleur.proxy(sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).enable()
+    sys.stderr.write("[green]Hi There!\n")
+    assert_stderr('\033[32mHi There!\n')
+    couleur.proxy(sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).disable()
+    sys.stderr.write("[black]should not be translated\n")
+    assert_stderr('[black]should not be translated\n')
