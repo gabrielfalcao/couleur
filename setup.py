@@ -15,9 +15,29 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import ast
+import io
 import os
-from couleur import version
-from setuptools import setup
+import re
+from setuptools import setup, find_packages
+
+
+class VersionFinder(ast.NodeVisitor):
+
+    def __init__(self):
+        self.version = None
+
+    def visit_Assign(self, node):
+        if node.targets[0].id == 'version':
+            self.version = node.value.s
+
+
+def read_version():
+    """Read version from httpretty/version.py without loading any files"""
+    finder = VersionFinder()
+    finder.visit(
+        ast.parse(local_file('couleur', '__init__.py').encode('utf-8')))
+    return finder.version
 
 
 def get_packages():
@@ -31,7 +51,7 @@ def get_packages():
 
 
 setup(name='couleur',
-    version=version,
+    version=read_version(),
     description=(u'ANSI terminal tool for python, colored shell and other '
                  'handy fancy features'),
     author='Gabriel Falcao',
