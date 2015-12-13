@@ -31,7 +31,7 @@ def get_packages():
 
 setup(
     name='couleur',
-    version='0.6.1',
+    version='0.6.2',
     description=(
         'ANSI terminal tool for python, colored shell and other '
         'handy fancy features'
