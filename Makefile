@@ -1,4 +1,4 @@
-.PHONY: tests all unit functional clean dependencies tdd docs html purge dist
+.PHONY: tests all clean dependencies tdd docs html purge dist
 
 GIT_ROOT		:= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 DOCS_ROOT		:= $(GIT_ROOT)/docs
@@ -25,7 +25,7 @@ $(VENV)/bin/sphinx-build $(VENV)/bin/twine $(VENV)/bin/nosetests $(VENV)/bin/pyt
 	$(VENV)/bin/pip install -r development.txt
 	$(VENV)/bin/pip install -e .
 
-# Runs the unit and functional tests
+# Runs all tests
 tests: $(VENV)/bin/nosetests  # runs all tests
 	$(VENV)/bin/nosetests tests --with-random --cover-erase
 
@@ -36,14 +36,6 @@ tdd: $(VENV)/bin/nosetests  # runs all tests
 dependencies: | $(VENV)/bin/nosetests
 	$(VENV)/bin/pip install -r development.txt
 
-# runs unit tests
-unit: $(VENV)/bin/nosetests  # runs only unit tests
-	$(VENV)/bin/nosetests --cover-erase tests/unit
-
-# runs functional tests
-functional: $(VENV)/bin/nosetests  # runs functional tests
-	$(VENV)/bin/nosetests tests/functional
-
 
 $(DOCS_INDEX): | $(VENV)/bin/sphinx-build
 	cd docs && make html
@@ -53,7 +45,7 @@ html: $(DOCS_INDEX)
 docs: $(DOCS_INDEX)
 	open $(DOCS_INDEX)
 
-release: | clean bento unit functional tests html
+release: | clean bento tests html
 	@rm -rf dist/*
 	@./.release
 	@make pypi
