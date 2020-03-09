@@ -1,7 +1,7 @@
 couleur - ANSI terminal tool for python, colored shell and other handy fancy features
 =====================================================================================
 
-**Version 0.6.2**
+**Version 0.7.0**
 
 **Couleur** is a handy tool to play around with ANSI features in a unix
 terminal
