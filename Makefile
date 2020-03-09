@@ -8,6 +8,7 @@ VENV			?= $(VENV_ROOT)
 BENTO_BIN		:= $(shell which bento)
 DOCS_INDEX		:= $(HTML_ROOT)/index.html
 BENTO_EMAIL		:= gabriel@nacaolivre.org
+export FORCE_COULEUR	:= true
 
 export VENV
 
