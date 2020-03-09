@@ -80,15 +80,17 @@ def wrapper_factory(delimiter):
 def translate_colors(string, delimiter):
     wrap_escaped, wrap_normal = wrapper_factory(delimiter)
 
-    for attr in re.findall(wrap_escaped("on[:](\w+)"), string):
+    for attr in re.findall(wrap_escaped(r"on[:](\w+)"), string):
         string = string.replace(
             wrap_normal("on:" + str(attr)), getattr(backcolors, attr)
         )
 
-    for attr in re.findall(wrap_escaped("(\w+)"), string):
+    for attr in re.findall(wrap_escaped(r"(\w+)"), string):
         string = string.replace(
             wrap_normal(attr), getattr(forecolors, attr, wrap_normal(attr))
-        ).replace(wrap_normal(attr), getattr(modifiers, attr, wrap_normal(attr)))
+        ).replace(
+            wrap_normal(attr), getattr(modifiers, attr, wrap_normal(attr))
+        )
 
     return minify(string)
 
@@ -99,16 +101,17 @@ def ignore_colors(string, delimiter):
     up_count_regex = re.compile(wrap_escaped(r"up"))
     up_count = len(up_count_regex.findall(string)) or 1
 
-    expression = ("^(?P<start>.*)(" + wrap_escaped("up") + ")(.*\\n){%d}") % up_count
+    expression = (r"^(?P<start>.*)(" + wrap_escaped("up") + ")(.*\\n){%d}") % up_count
     up_supress_regex = re.compile(expression, re.MULTILINE)
 
-    string = up_supress_regex.sub("\g<start>", string)
+    string = up_supress_regex.sub(r"\g<start>", string)
 
-    for attr in re.findall(wrap_escaped("on[:](\w+)"), string):
+    for attr in re.findall(wrap_escaped(r"on[:](\w+)"), string):
         string = string.replace(wrap_normal("on:" + str(attr)), "")
 
-    for attr in re.findall(wrap_escaped("(\w+)"), string):
-        string = string.replace(wrap_normal(attr), "").replace(wrap_normal(attr), "")
+    for attr in re.findall(wrap_escaped(r"(\w+)"), string):
+        string = string.replace(wrap_normal(attr), "").replace(
+            wrap_normal(attr), "")
 
     return string
 

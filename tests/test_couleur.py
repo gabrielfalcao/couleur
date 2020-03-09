@@ -76,7 +76,7 @@ def test_mixed_output(spec):
 def test_mixed_output_with_escaped_separator(spec):
     "green_and_red_on_yellow works is a valid call"
     spec.make_shell()
-    spec.sh.green_and_red_on_yellow("Hello |World \|for you!")
+    spec.sh.green_and_red_on_yellow(r"Hello |World \|for you!")
     spec.check_output("\033[32mHello \033[0m\033[43m\033[31mWorld |for you!\033[0m")
 
 
