@@ -51,6 +51,7 @@ setup(
     description=(
         "ANSI terminal tool for python, colored shell and other " "handy fancy features"
     ),
+    long_description=local_file("README.rst"),
     author="Gabriel Falcao",
     author_email="gabriel@nacaolivre.org",
     url="http://github.com/gabrielfalcao/couleur",

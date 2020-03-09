@@ -1,7 +1,47 @@
 couleur - ANSI terminal tool for python, colored shell and other handy fancy features
 =====================================================================================
+.. image:: https://img.shields.io/pypi/dm/couleur
+   :target: https://pypi.org/project/couleur
 
-**Version 0.7.0**
+.. image:: https://img.shields.io/codecov/c/github/gabrielfalcao/couleur
+   :target: https://codecov.io/gh/gabrielfalcao/couleur
+
+.. image:: https://img.shields.io/github/workflow/status/gabrielfalcao/couleur/python-3.6?label=python%203.6
+   :target: https://github.com/gabrielfalcao/couleur/actions
+
+.. image:: https://img.shields.io/github/workflow/status/gabrielfalcao/couleur/python-3.7?label=python%203.7
+   :target: https://github.com/gabrielfalcao/couleur/actions
+
+.. image:: https://img.shields.io/readthedocs/couleur
+   :target: https://couleur.readthedocs.io/
+
+.. image:: https://img.shields.io/github/license/gabrielfalcao/couleur?label=Github%20License
+   :target: https://github.com/gabrielfalcao/couleur/blob/master/LICENSE
+
+.. image:: https://img.shields.io/pypi/v/couleur
+   :target: https://pypi.org/project/couleur
+
+.. image:: https://img.shields.io/pypi/l/couleur?label=PyPi%20License
+   :target: https://pypi.org/project/couleur
+
+.. image:: https://img.shields.io/pypi/format/couleur
+   :target: https://pypi.org/project/couleur
+
+.. image:: https://img.shields.io/pypi/status/couleur
+   :target: https://pypi.org/project/couleur
+
+.. image:: https://img.shields.io/pypi/pyversions/couleur
+   :target: https://pypi.org/project/couleur
+
+.. image:: https://img.shields.io/pypi/implementation/couleur
+   :target: https://pypi.org/project/couleur
+
+.. image:: https://img.shields.io/snyk/vulnerabilities/github/gabrielfalcao/couleur
+   :target: https://github.com/gabrielfalcao/couleur/network/alerts
+
+.. image:: https://img.shields.io/github/v/tag/gabrielfalcao/couleur
+   :target: https://github.com/gabrielfalcao/couleur/releases
+
 
 **Couleur** is a handy tool to play around with ANSI features in a unix
 terminal
