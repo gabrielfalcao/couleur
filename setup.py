@@ -41,7 +41,7 @@ class VersionFinder(ast.NodeVisitor):
 
 def read_version():
     finder = VersionFinder()
-    finder.visit(ast.parse(local_file("uiclasses", "version.py")))
+    finder.visit(ast.parse(local_file("couleur", "version.py")))
     return finder.version
 
 
