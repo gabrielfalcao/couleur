@@ -1,3 +1,49 @@
-*.pyc
+*.py[cod]
+
+# C extensions
+*.so
+.idea/
+.idea
+
+# Packages
+*.egg
+*.egg-info
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
 .coverage
-couleur.egg-info/
+.tox
+nosetests.xml
+
+# si
+*.mo
+# Complexity
+output/*.html
+output/*/index.html
+
+# Sphinx
+docs/_build
+docs/source/_build
+
+# Mypy
+.mypy_cache/
+
+docs/build/
+.DS_Store
+.venv/
+.noseids
+/dist/
+/dist/*
+
+coverage.xml

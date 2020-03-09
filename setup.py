@@ -1,7 +1,6 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # <Couleur - fancy shell output for python>
-# Copyright (C) <2010-2012>  Gabriel Falcão <gabriel@nacaolivre.org>
+# Copyright (C) <2010-2020>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -15,36 +14,52 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import ast
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
-def get_packages():
-    # setuptools can't do the job :(
-    packages = []
-    for root, dirnames, filenames in os.walk('couleur'):
-        if '__init__.py' in filenames:
-            packages.append(".".join(os.path.split(root)).strip("."))
+def local_file(*f):
+    with open(os.path.join(os.path.dirname(__file__), *f), "r") as fd:
+        return fd.read()
 
-    return packages
+
+class VersionFinder(ast.NodeVisitor):
+    VARIABLE_NAME = "version"
+
+    def __init__(self):
+        self.version = None
+
+    def visit_Assign(self, node):
+        try:
+            if node.targets[0].id == self.VARIABLE_NAME:
+                self.version = node.value.s
+        except Exception:
+            self.version = None
+
+
+def read_version():
+    finder = VersionFinder()
+    finder.visit(ast.parse(local_file("uiclasses", "version.py")))
+    return finder.version
 
 
 setup(
-    name='couleur',
-    version='0.6.2',
+    name="couleur",
+    version="0.6.2",
     description=(
-        'ANSI terminal tool for python, colored shell and other '
-        'handy fancy features'
+        "ANSI terminal tool for python, colored shell and other " "handy fancy features"
     ),
-    author='Gabriel Falcao',
-    author_email='gabriel@nacaolivre.org',
-    url='http://github.com/gabrielfalcao/couleur',
-    packages=get_packages(),
+    author="Gabriel Falcao",
+    author_email="gabriel@nacaolivre.org",
+    url="http://github.com/gabrielfalcao/couleur",
+    packages=find_packages(exclude=["*tests*"]),
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'License :: OSI Approved :: Apache Software License',
+        "Development Status :: 5 - Production/Stable",
+        "License :: OSI Approved :: Apache Software License",
         "Operating System :: POSIX",
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2",
     ],
 )

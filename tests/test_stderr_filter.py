@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
-from StringIO import StringIO
+from io import StringIO
 from nose.tools import with_setup, assert_equals
 
 import couleur
@@ -42,10 +42,10 @@ def test_output_black_foreground():
 
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{black}Hello Black!\n")
-    assert_stderr('\033[30mHello Black!\n')
+    assert_stderr("\033[30mHello Black!\n")
     couleur.proxy(sys.stderr).disable()
     sys.stderr.write("#{black}should not be translated\n")
-    assert_stderr('#{black}should not be translated\n')
+    assert_stderr("#{black}should not be translated\n")
 
 
 @with_setup(prepare_stderr)
@@ -54,10 +54,10 @@ def test_output_black_on_white_foreground():
 
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{black}#{on:white}Hello Black!\n")
-    assert_stderr('\033[30;47mHello Black!\n')
+    assert_stderr("\033[30;47mHello Black!\n")
     couleur.proxy(sys.stderr).disable()
     sys.stderr.write("#{black}should not be translated\n")
-    assert_stderr('#{black}should not be translated\n')
+    assert_stderr("#{black}should not be translated\n")
 
 
 @with_setup(prepare_stderr)
@@ -66,10 +66,10 @@ def test_output_green_foreground():
 
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{green}Hello Green!\n")
-    assert_stderr('\033[32mHello Green!\n')
+    assert_stderr("\033[32mHello Green!\n")
     couleur.proxy(sys.stderr).disable()
     sys.stderr.write("#{black}should not be translated\n")
-    assert_stderr('#{black}should not be translated\n')
+    assert_stderr("#{black}should not be translated\n")
 
 
 @with_setup(prepare_stderr)
@@ -78,10 +78,10 @@ def test_output_green_and_red_on_white_foreground():
 
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{green}Hello #{white}#{on:red}Italy!\n")
-    assert_stderr('\033[32mHello \033[37;41mItaly!\n')
+    assert_stderr("\033[32mHello \033[37;41mItaly!\n")
     couleur.proxy(sys.stderr).disable()
     sys.stderr.write("#{black}should not be translated\n")
-    assert_stderr('#{black}should not be translated\n')
+    assert_stderr("#{black}should not be translated\n")
 
 
 @with_setup(prepare_stderr)
@@ -91,13 +91,13 @@ def test_output_stderr_ignoring_output():
     couleur.proxy(sys.stderr).enable()
     couleur.proxy(sys.stderr).ignore()
     sys.stderr.write("#{green}Hello #{white}#{on:blue}World!#{reset}\n")
-    assert_stderr('Hello World!\n')
+    assert_stderr("Hello World!\n")
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{green}Hi There!\n")
-    assert_stderr('\033[32mHi There!\n')
+    assert_stderr("\033[32mHi There!\n")
     couleur.proxy(sys.stderr).disable()
     sys.stderr.write("#{black}should not be translated\n")
-    assert_stderr('#{black}should not be translated\n')
+    assert_stderr("#{black}should not be translated\n")
 
 
 def test_integration_with_stderr():
@@ -117,10 +117,10 @@ def test_output_stderr_ignoring_output_square_brackets():
     couleur.proxy(sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).enable()
     couleur.proxy(sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).ignore()
     sys.stderr.write("[green]Hello [white][on:blue]World![reset]\n")
-    assert_stderr('Hello World!\n')
+    assert_stderr("Hello World!\n")
     couleur.proxy(sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).enable()
     sys.stderr.write("[green]Hi There!\n")
-    assert_stderr('\033[32mHi There!\n')
+    assert_stderr("\033[32mHi There!\n")
     couleur.proxy(sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).disable()
     sys.stderr.write("[black]should not be translated\n")
-    assert_stderr('[black]should not be translated\n')
+    assert_stderr("[black]should not be translated\n")

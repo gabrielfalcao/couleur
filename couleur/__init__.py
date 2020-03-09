@@ -19,10 +19,10 @@ import re
 import sys
 import uuid
 import platform
+from io import StringIO
 
-version = '0.6.2'
 
-from StringIO import StringIO
+version = "0.6.2"
 
 
 class delimiters:
@@ -31,34 +31,34 @@ class delimiters:
 
 
 SUPPORTS_ANSI = False
-ANSI_OK = ('TERM' in os.environ and os.environ['TERM'] == 'ANSI')
+ANSI_OK = "TERM" in os.environ and os.environ["TERM"] == "ANSI"
 
 for handle in [sys.stdout, sys.stderr]:
     if (hasattr(handle, "isatty") and handle.isatty()) or ANSI_OK:
-        if platform.system() == 'Windows' and not ANSI_OK:
+        if platform.system() == "Windows" and not ANSI_OK:
             SUPPORTS_ANSI = False
         else:
             SUPPORTS_ANSI = True
 
-if os.getenv('COULEUR_DISABLE'):
+if os.getenv("COULEUR_DISABLE"):
     SUPPORTS_ANSI = False
 
-if os.getenv('FORCE_COULEUR'):
+if os.getenv("FORCE_COULEUR"):
     SUPPORTS_ANSI = True
 
 
 def minify(string):
-    regex_items = re.compile('(\033\[(\d+)m)')
-    regex_main = re.compile('(?P<main>(\033\[(\d+)m){2,})')
+    regex_items = re.compile(r"(\033\[(\d+)m)")
+    regex_main = re.compile(r"(?P<main>(\033\[(\d+)m){2,})")
 
     replaced = string
     main_found = regex_main.search(string)
 
     if main_found:
-        existent = main_found.group('main')
+        existent = main_found.group("main")
         found = ";".join(x[1] for x in regex_items.findall(existent))
         if found:
-            replaced = string.replace(existent, '\033[%sm' % found)
+            replaced = string.replace(existent, "\033[%sm" % found)
 
     return replaced
 
@@ -82,18 +82,13 @@ def translate_colors(string, delimiter):
 
     for attr in re.findall(wrap_escaped("on[:](\w+)"), string):
         string = string.replace(
-            wrap_normal(u"on:" + unicode(attr)),
-            getattr(backcolors, attr)
+            wrap_normal("on:" + str(attr)), getattr(backcolors, attr)
         )
 
     for attr in re.findall(wrap_escaped("(\w+)"), string):
         string = string.replace(
-            wrap_normal(attr),
-            getattr(forecolors, attr, wrap_normal(attr))
-        ).replace(
-            wrap_normal(attr),
-            getattr(modifiers, attr, wrap_normal(attr))
-        )
+            wrap_normal(attr), getattr(forecolors, attr, wrap_normal(attr))
+        ).replace(wrap_normal(attr), getattr(modifiers, attr, wrap_normal(attr)))
 
     return minify(string)
 
@@ -101,21 +96,19 @@ def translate_colors(string, delimiter):
 def ignore_colors(string, delimiter):
     wrap_escaped, wrap_normal = wrapper_factory(delimiter)
 
-    up_count_regex = re.compile(wrap_escaped(ur'up'))
+    up_count_regex = re.compile(wrap_escaped(r"up"))
     up_count = len(up_count_regex.findall(string)) or 1
 
-    expression = (u'^(?P<start>.*)(' + wrap_escaped('up') + u')(.*\\n){%d}') % up_count
+    expression = ("^(?P<start>.*)(" + wrap_escaped("up") + ")(.*\\n){%d}") % up_count
     up_supress_regex = re.compile(expression, re.MULTILINE)
 
-    string = up_supress_regex.sub('\g<start>', string)
+    string = up_supress_regex.sub("\g<start>", string)
 
     for attr in re.findall(wrap_escaped("on[:](\w+)"), string):
-        string = string.replace(wrap_normal(u"on:" + unicode(attr)), u"")
+        string = string.replace(wrap_normal("on:" + str(attr)), "")
 
     for attr in re.findall(wrap_escaped("(\w+)"), string):
-        string = (string
-                  .replace(wrap_normal(attr), u"")
-                  .replace(wrap_normal(attr), u""))
+        string = string.replace(wrap_normal(attr), "").replace(wrap_normal(attr), "")
 
     return string
 
@@ -157,7 +150,9 @@ class Proxy(object):
     def ignore(self):
         self.output.translate = False
         if not isinstance(self.output, (StdErrMocker, StdOutMocker)):
-            self.output.write = lambda x: self.old_write(ignore_colors(x, self.delimiter))
+            self.output.write = lambda x: self.old_write(
+                ignore_colors(x, self.delimiter)
+            )
 
     def enable(self):
         self.disable()
@@ -168,7 +163,9 @@ class Proxy(object):
         elif isinstance(self.output, StdErrMocker):
             sys.stderr = self.output
         else:
-            self.output.write = lambda x: self.old_write(translate_colors(x, self.delimiter))
+            self.output.write = lambda x: self.old_write(
+                translate_colors(x, self.delimiter)
+            )
 
     def disable(self):
         if isinstance(self.output, StdOutMocker):
@@ -178,11 +175,12 @@ class Proxy(object):
         else:
             self.output.write = self.old_write
 
+
 _proxy_registry = {}
 
 
 def proxy(output, delimiter=delimiters.DEFAULT):
-    if output not in _proxy_registry.keys():
+    if output not in list(_proxy_registry.keys()):
         _proxy_registry[output] = Proxy(output, delimiter)
 
     return _proxy_registry[output]
@@ -194,8 +192,8 @@ def ansify(number):
     Arguments:
     - `number`: the code in question
     """
-    number = unicode(number)
-    return u'\033[%sm' % number
+    number = str(number)
+    return "\033[%sm" % number
 
 
 class modifiers:
@@ -206,7 +204,7 @@ class modifiers:
     underline = ansify(4)
     inverse = ansify(7)
     strikethrough = ansify(9)
-    up = u'\r\033[A'
+    up = "\r\033[A"
 
 
 class forecolors:
@@ -235,18 +233,25 @@ class backcolors:
 
 class empty(object):
     def __getattr__(self, attr):
-        if attr != 'up':
-            return u''
+        if attr != "up":
+            return ""
         else:
             return modifiers.up
 
-_sep1 = u'_on_'
-_sep2 = u'_and_'
+
+_sep1 = "_on_"
+_sep2 = "_and_"
 
 
 class Shell(object):
-    def __init__(self, output=None, indent=2, linebreak=False, bold=False,
-                 disabled=not SUPPORTS_ANSI):
+    def __init__(
+        self,
+        output=None,
+        indent=2,
+        linebreak=False,
+        bold=False,
+        disabled=not SUPPORTS_ANSI,
+    ):
         self._indentation_factor = indent
         self._indent = 0
         self._linebreak = linebreak
@@ -278,8 +283,8 @@ class Shell(object):
                 r = getattr(self._forecolors, what)
             return r
 
-        args = map(get, color.split(u"_"))
-        return u"".join(args)
+        args = list(map(get, color.split("_")))
+        return "".join(args)
 
     def _back(self, color):
         return getattr(self._backcolors, color)
@@ -287,11 +292,7 @@ class Shell(object):
     def _printer_for(self, color):
         colors = color.split(_sep1)
 
-        parts = [
-            self._fore(colors.pop(0)),
-            u"%s",
-            self._modifiers.reset
-        ]
+        parts = [self._fore(colors.pop(0)), "%s", self._modifiers.reset]
 
         if colors:
             parts.insert(0, self._back(colors[0]))
@@ -301,44 +302,44 @@ class Shell(object):
                 parts.insert(0, self._modifiers.bold)
 
             if self._indent:
-                parts.insert(0, u' ' * self._indent)
+                parts.insert(0, " " * self._indent)
 
             if self._linebreak:
-                parts.append(u"\n")
+                parts.append("\n")
 
-        string = u"".join(map(unicode, parts))
+        string = "".join(map(str, parts))
 
         def dec(z, replace=False):
-            pre = unicode(replace and self._modifiers.up or u'')
+            pre = str(replace and self._modifiers.up or "")
             self.output.write(pre)
-            self.output.write(string % unicode(z.decode('utf-8')))
+            self.output.write(string % str(z))
 
         return dec
 
     def __getattr__(self, attr):
-        if not attr.startswith(u"_"):
+        if not attr.startswith("_"):
             if _sep2 in attr:
                 self._in_format = True
-                printers = map(self._printer_for, attr.split(_sep2))
+                printers = list(map(self._printer_for, attr.split(_sep2)))
 
                 def dec(string, replace=False):
                     unique = str(uuid.uuid4())
-                    string = string.replace(ur'\|', unique)
-                    parts = string.split(ur"|")
+                    string = string.replace(r"\|", unique)
+                    parts = string.split(r"|")
                     if replace:
                         self.output.write(self._modifiers.up)
 
                     if self._indent:
-                        self.output.write(u' ' * self._indent)
+                        self.output.write(" " * self._indent)
 
                     if self._bold:
                         self.output.write(self._modifiers.bold)
 
                     for part, output in zip(parts, printers):
-                        output(part.replace(unique, ur"|"))
+                        output(part.replace(unique, r"|"))
 
                     if self._linebreak:
-                        self.output.write(u"\n")
+                        self.output.write("\n")
 
                     self._in_format = False
 
