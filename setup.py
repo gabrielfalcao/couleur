@@ -58,7 +58,6 @@ setup(
     packages=find_packages(exclude=["*tests*"]),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
-        "License :: OSI Approved :: Apache Software License",
         "Operating System :: POSIX",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
