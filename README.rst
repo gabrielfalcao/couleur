@@ -1,5 +1,10 @@
 couleur - ANSI terminal tool for python, colored shell and other handy fancy features
 =====================================================================================
+
+**Couleur** is a handy tool to play around with ANSI features in a unix
+terminal
+
+
 .. image:: https://img.shields.io/pypi/dm/couleur
    :target: https://pypi.org/project/couleur
 
@@ -42,9 +47,6 @@ couleur - ANSI terminal tool for python, colored shell and other handy fancy fea
 .. image:: https://img.shields.io/github/v/tag/gabrielfalcao/couleur
    :target: https://github.com/gabrielfalcao/couleur/releases
 
-
-**Couleur** is a handy tool to play around with ANSI features in a unix
-terminal
 
 installing
 ----------
