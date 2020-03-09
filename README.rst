@@ -21,7 +21,7 @@ terminal
    :target: https://couleur.readthedocs.io/
 
 .. image:: https://img.shields.io/github/license/gabrielfalcao/couleur?label=Github%20License
-   :target: https://github.com/gabrielfalcao/couleur/blob/master/LICENSE
+   :target: https://github.com/gabrielfalcao/couleur/blob/master/COPYING
 
 .. image:: https://img.shields.io/pypi/v/couleur
    :target: https://pypi.org/project/couleur
@@ -217,7 +217,7 @@ Licensing
 ::
 
    Copyright (c) 2010-2020 Gabriel Falcão
-   Licensed under Apache License 2.0
-   http://www.apache.org/licenses/LICENSE-2.0.html
+   Licensed under LGPLv3
+   https://opensource.org/licenses/lgpl-3.0.html
 
 `Bitdeli Badge <https://bitdeli.com/free>`__
