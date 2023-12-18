@@ -1,0 +1,44 @@
+name: Couleur Tests
+on: [push, pull_request]
+
+jobs:
+  python:
+    name: "Python"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python:
+          - "3.9"
+          - "3.7"
+          - "3.10"
+          - "3.11"
+          - "3.6"
+          - "3.8"
+
+    steps:
+    - uses: actions/checkout@v3
+    - id: bento
+      name: Bento
+      uses: returntocorp/bento-action@v1
+      with:
+        acceptTermsWithEmail: gabrielteratos@gmail.com
+
+    - name: Install python version
+      uses: gabrielfalcao/pyenv-action@v18
+      with:
+        default: "${{ matrix.python }}"
+        command: pip install -U pip setuptools
+
+    - name: Install dependencies
+      run: pip install -r development.txt
+
+    - name: Install couleur
+      run: pip install -e .
+
+    - name: Test
+      run: make tests
+
+    - name: "Upload coverage results to codecov.io"
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./coverage.xml # optional

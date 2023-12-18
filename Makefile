@@ -7,7 +7,7 @@ VENV_ROOT		:= $(GIT_ROOT)/.venv
 VENV			?= $(VENV_ROOT)
 BENTO_BIN		:= $(shell which bento)
 DOCS_INDEX		:= $(HTML_ROOT)/index.html
-BENTO_EMAIL		:= gabriel@nacaolivre.org
+BENTO_EMAIL		:= gabrielteratos@gmail.com
 export FORCE_COULEUR	:= true
 
 export VENV
@@ -26,10 +26,10 @@ $(VENV)/bin/sphinx-build $(VENV)/bin/twine $(VENV)/bin/sure $(VENV)/bin/python $
 
 # Runs all tests
 tests: $(VENV)/bin/sure  # runs all tests
-	$(VENV)/bin/sure tests
+	$(VENV)/bin/sure --with-coverage --cover-module=couleur --cover-branches --immediate tests
 
 tdd: $(VENV)/bin/sure  # runs all tests
-	$(VENV)/bin/sure tests
+	$(VENV)/bin/sure --with-coverage --cover-module=couleur --cover-branches --immediate tests
 
 # Install dependencies
 dependencies: | $(VENV)/bin/sure
