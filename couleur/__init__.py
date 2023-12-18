@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # <Couleur - fancy shell output for python>
-# Copyright (C) <2010-2012>  Gabriel Falcão <gabriel@nacaolivre.org>
+# Copyright (C) <2010-2023>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -20,9 +20,6 @@ import sys
 import uuid
 import platform
 from io import StringIO
-
-
-version = "0.6.2"
 
 
 class delimiters:
@@ -129,11 +126,11 @@ class Writer(StringIO):
         self.original.write(f(string, self.delimiter))
 
 
-class StdOutMocker(Writer):
+class StdOutWrapper(Writer):
     original = sys.__stdout__
 
 
-class StdErrMocker(Writer):
+class StdErrWrapper(Writer):
     original = sys.__stderr__
 
 
@@ -143,16 +140,16 @@ class Proxy(object):
         self.delimiter = delimiter
 
         if output is sys.__stdout__:
-            output = StdOutMocker(delimiter)
+            output = StdOutWrapper(delimiter)
 
         elif output is sys.__stderr__:
-            output = StdErrMocker(delimiter)
+            output = StdErrWrapper(delimiter)
 
         self.output = output
 
     def ignore(self):
         self.output.translate = False
-        if not isinstance(self.output, (StdErrMocker, StdOutMocker)):
+        if not isinstance(self.output, (StdErrWrapper, StdOutWrapper)):
             self.output.write = lambda x: self.old_write(
                 ignore_colors(x, self.delimiter)
             )
@@ -161,9 +158,9 @@ class Proxy(object):
         self.disable()
 
         self.output.translate = True
-        if isinstance(self.output, StdOutMocker):
+        if isinstance(self.output, StdOutWrapper):
             sys.stdout = self.output
-        elif isinstance(self.output, StdErrMocker):
+        elif isinstance(self.output, StdErrWrapper):
             sys.stderr = self.output
         else:
             self.output.write = lambda x: self.old_write(
@@ -171,9 +168,9 @@ class Proxy(object):
             )
 
     def disable(self):
-        if isinstance(self.output, StdOutMocker):
+        if isinstance(self.output, StdOutWrapper):
             sys.stdout = self.output.original
-        elif isinstance(self.output, StdErrMocker):
+        elif isinstance(self.output, StdErrWrapper):
             sys.stderr = self.output.original
         else:
             self.output.write = self.old_write
@@ -195,8 +192,16 @@ def ansify(number):
     Arguments:
     - `number`: the code in question
     """
-    number = str(number)
-    return "\033[%sm" % number
+    return f"\033[{number}m"
+
+
+def color256(number):
+    """Wraps the given ansi code to a proper escaped python output
+
+    Arguments:
+    - `number`: the code in question
+    """
+    return f"\033[1;38;5;{number}m"
 
 
 class modifiers:

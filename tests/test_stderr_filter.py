@@ -16,30 +16,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
 from io import StringIO
-from nose.tools import with_setup, assert_equals
+from sure import that_with_context
 
 import couleur
 
 
-def prepare_stderr():
+def prepare_stderr(context):
     if isinstance(sys.stderr, StringIO):
         del sys.stderr
 
-    std = StringIO()
-    sys.stderr = std
+    sys.stderr = StringIO()
 
 
 def assert_stderr(expected):
     string = sys.stderr.getvalue()
     sys.stderr.seek(0)
     sys.stderr.truncate()
-    assert_equals(string, expected)
+    string.should.equal(expected)
 
 
-@with_setup(prepare_stderr)
+@that_with_context(prepare_stderr)
 def test_output_black_foreground():
     "STDERR filter output: black foreground"
-
+    import ipdb;ipdb.set_trace()
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{black}Hello Black!\n")
     assert_stderr("\033[30mHello Black!\n")
@@ -48,7 +47,7 @@ def test_output_black_foreground():
     assert_stderr("#{black}should not be translated\n")
 
 
-@with_setup(prepare_stderr)
+@that_with_context(prepare_stderr)
 def test_output_black_on_white_foreground():
     "STDERR filter output: black foreground on white background"
 
@@ -60,7 +59,7 @@ def test_output_black_on_white_foreground():
     assert_stderr("#{black}should not be translated\n")
 
 
-@with_setup(prepare_stderr)
+@that_with_context(prepare_stderr)
 def test_output_green_foreground():
     "STDERR filter output: green foreground"
 
@@ -72,7 +71,7 @@ def test_output_green_foreground():
     assert_stderr("#{black}should not be translated\n")
 
 
-@with_setup(prepare_stderr)
+@that_with_context(prepare_stderr)
 def test_output_green_and_red_on_white_foreground():
     "STDERR filter output: green foreground and white on red background"
 
@@ -84,7 +83,7 @@ def test_output_green_and_red_on_white_foreground():
     assert_stderr("#{black}should not be translated\n")
 
 
-@with_setup(prepare_stderr)
+@that_with_context(prepare_stderr)
 def test_output_stderr_ignoring_output():
     "STDERR filter output: ignoring output"
 
@@ -110,7 +109,7 @@ def test_integration_with_stderr():
     assert sys.stderr is sys.__stderr__
 
 
-@with_setup(prepare_stderr)
+@that_with_context(prepare_stderr)
 def test_output_stderr_ignoring_output_square_brackets():
     "STDERR filter output: ignoring output"
 

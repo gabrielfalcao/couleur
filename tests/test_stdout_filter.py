@@ -16,7 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
 from io import StringIO
-from nose.tools import with_setup, assert_equals
+from sure import that_with_context
+
 
 import couleur
 
@@ -25,18 +26,17 @@ def prepare_stdout():
     if isinstance(sys.stdout, StringIO):
         del sys.stdout
 
-    std = StringIO()
-    sys.stdout = std
+    sys.stdout = StringIO()
 
 
 def assert_stdout(expected):
     string = sys.stdout.getvalue()
     sys.stdout.seek(0)
     sys.stdout.truncate()
-    assert_equals(string, expected)
+    string.should.equal(expected)
 
 
-@with_setup(prepare_stdout)
+@that_with_context(prepare_stdout)
 def test_output_black_foreground():
     "STDOUT filter output: black foreground"
 
@@ -48,7 +48,7 @@ def test_output_black_foreground():
     assert_stdout("#{black}should not be translated\n")
 
 
-@with_setup(prepare_stdout)
+@that_with_context(prepare_stdout)
 def test_output_black_on_white_foreground():
     "STDOUT filter output: black foreground on white background"
 
@@ -60,7 +60,7 @@ def test_output_black_on_white_foreground():
     assert_stdout("#{black}should not be translated\n")
 
 
-@with_setup(prepare_stdout)
+@that_with_context(prepare_stdout)
 def test_output_green_foreground():
     "STDOUT filter output: green foreground"
 
@@ -72,7 +72,7 @@ def test_output_green_foreground():
     assert_stdout("#{black}should not be translated\n")
 
 
-@with_setup(prepare_stdout)
+@that_with_context(prepare_stdout)
 def test_output_green_and_red_on_white_foreground():
     "STDOUT filter output: green foreground and white on red background"
 
@@ -84,7 +84,7 @@ def test_output_green_and_red_on_white_foreground():
     assert_stdout("#{black}should not be translated\n")
 
 
-@with_setup(prepare_stdout)
+@that_with_context(prepare_stdout)
 def test_output_stdout_ignoring_output():
     "STDOUT filter output: green foreground and white on red background"
 
@@ -110,7 +110,7 @@ def test_integration_with_stdout():
     assert sys.stdout is sys.__stdout__
 
 
-@with_setup(prepare_stdout)
+@that_with_context(prepare_stdout)
 def test_output_different_delimiters():
     "using square brackets as delimiters should work"
 
@@ -122,7 +122,7 @@ def test_output_different_delimiters():
     assert_stdout("[black]should not be translated\n")
 
 
-@with_setup(prepare_stdout)
+@that_with_context(prepare_stdout)
 def test_output_stdout_ignoring_output_square_brackets():
     "STDOUT filter output: ignoring output"
 

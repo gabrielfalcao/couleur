@@ -13,27 +13,26 @@ export FORCE_COULEUR	:= true
 export VENV
 
 
-
 all: dependencies tests
 
 $(VENV):  # creates $(VENV) folder if does not exist
 	python3 -mvenv $(VENV)
 	$(VENV)/bin/pip install -U pip setuptools
 
-$(VENV)/bin/sphinx-build $(VENV)/bin/twine $(VENV)/bin/nosetests $(VENV)/bin/python $(VENV)/bin/pip: # installs latest pip
+$(VENV)/bin/sphinx-build $(VENV)/bin/twine $(VENV)/bin/sure $(VENV)/bin/python $(VENV)/bin/pip: # installs latest pip
 	test -e $(VENV)/bin/pip || make $(VENV)
 	$(VENV)/bin/pip install -r development.txt
 	$(VENV)/bin/pip install -e .
 
 # Runs all tests
-tests: $(VENV)/bin/nosetests  # runs all tests
-	$(VENV)/bin/nosetests tests --with-random --cover-erase
+tests: $(VENV)/bin/sure  # runs all tests
+	$(VENV)/bin/sure tests
 
-tdd: $(VENV)/bin/nosetests  # runs all tests
-	$(VENV)/bin/nosetests tests --with-watch --cover-erase
+tdd: $(VENV)/bin/sure  # runs all tests
+	$(VENV)/bin/sure tests
 
 # Install dependencies
-dependencies: | $(VENV)/bin/nosetests
+dependencies: | $(VENV)/bin/sure
 	$(VENV)/bin/pip install -r development.txt
 
 
