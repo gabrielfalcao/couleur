@@ -36,61 +36,60 @@ def assert_stderr(expected):
 
 
 @that_with_context(prepare_stderr)
-def test_output_black_foreground():
+def test_output_black_foreground(context):
     "STDERR filter output: black foreground"
-    import ipdb;ipdb.set_trace()
     couleur.proxy(sys.stderr).enable()
-    sys.stderr.write("#{black}Hello Black!\n")
-    assert_stderr("\033[30mHello Black!\n")
+    sys.stderr.write("#{black}Hi Black!\n")
+    assert_stderr("\033[30mHi Black!\n")
     couleur.proxy(sys.stderr).disable()
     sys.stderr.write("#{black}should not be translated\n")
     assert_stderr("#{black}should not be translated\n")
 
 
 @that_with_context(prepare_stderr)
-def test_output_black_on_white_foreground():
+def test_output_black_on_white_foreground(context):
     "STDERR filter output: black foreground on white background"
 
     couleur.proxy(sys.stderr).enable()
-    sys.stderr.write("#{black}#{on:white}Hello Black!\n")
-    assert_stderr("\033[30;47mHello Black!\n")
+    sys.stderr.write("#{black}#{on:white}Hi Black!\n")
+    assert_stderr("\033[30;47mHi Black!\n")
     couleur.proxy(sys.stderr).disable()
     sys.stderr.write("#{black}should not be translated\n")
     assert_stderr("#{black}should not be translated\n")
 
 
 @that_with_context(prepare_stderr)
-def test_output_green_foreground():
+def test_output_green_foreground(context):
     "STDERR filter output: green foreground"
 
     couleur.proxy(sys.stderr).enable()
-    sys.stderr.write("#{green}Hello Green!\n")
-    assert_stderr("\033[32mHello Green!\n")
+    sys.stderr.write("#{green}Hi Green!\n")
+    assert_stderr("\033[32mHi Green!\n")
     couleur.proxy(sys.stderr).disable()
     sys.stderr.write("#{black}should not be translated\n")
     assert_stderr("#{black}should not be translated\n")
 
 
 @that_with_context(prepare_stderr)
-def test_output_green_and_red_on_white_foreground():
+def test_output_green_and_red_on_white_foreground(context):
     "STDERR filter output: green foreground and white on red background"
 
     couleur.proxy(sys.stderr).enable()
-    sys.stderr.write("#{green}Hello #{white}#{on:red}Italy!\n")
-    assert_stderr("\033[32mHello \033[37;41mItaly!\n")
+    sys.stderr.write("#{green}Hi #{white}#{on:red}Italy!\n")
+    assert_stderr("\033[32mHi \033[37;41mItaly!\n")
     couleur.proxy(sys.stderr).disable()
     sys.stderr.write("#{black}should not be translated\n")
     assert_stderr("#{black}should not be translated\n")
 
 
 @that_with_context(prepare_stderr)
-def test_output_stderr_ignoring_output():
+def test_output_stderr_ignoring_output(context):
     "STDERR filter output: ignoring output"
 
     couleur.proxy(sys.stderr).enable()
     couleur.proxy(sys.stderr).ignore()
-    sys.stderr.write("#{green}Hello #{white}#{on:blue}World!#{reset}\n")
-    assert_stderr("Hello World!\n")
+    sys.stderr.write("#{green}Hi #{white}#{on:blue}World!#{reset}\n")
+    assert_stderr("Hi World!\n")
     couleur.proxy(sys.stderr).enable()
     sys.stderr.write("#{green}Hi There!\n")
     assert_stderr("\033[32mHi There!\n")
@@ -110,16 +109,20 @@ def test_integration_with_stderr():
 
 
 @that_with_context(prepare_stderr)
-def test_output_stderr_ignoring_output_square_brackets():
+def test_output_stderr_ignoring_output_square_brackets(context):
     "STDERR filter output: ignoring output"
 
-    couleur.proxy(sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).enable()
-    couleur.proxy(sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).ignore()
-    sys.stderr.write("[green]Hello [white][on:blue]World![reset]\n")
-    assert_stderr("Hello World!\n")
-    couleur.proxy(sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).enable()
+    couleur.proxy(
+        sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).enable()
+    couleur.proxy(
+        sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).ignore()
+    sys.stderr.write("[green]Hi [white][on:blue]World![reset]\n")
+    assert_stderr("Hi World!\n")
+    couleur.proxy(
+        sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).enable()
     sys.stderr.write("[green]Hi There!\n")
     assert_stderr("\033[32mHi There!\n")
-    couleur.proxy(sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).disable()
+    couleur.proxy(
+        sys.stderr, delimiter=couleur.delimiters.SQUARE_BRACKETS).disable()
     sys.stderr.write("[black]should not be translated\n")
     assert_stderr("[black]should not be translated\n")

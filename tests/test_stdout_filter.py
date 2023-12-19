@@ -22,7 +22,7 @@ from sure import that_with_context
 import couleur
 
 
-def prepare_stdout():
+def prepare_stdout(context):
     if isinstance(sys.stdout, StringIO):
         del sys.stdout
 
@@ -37,7 +37,7 @@ def assert_stdout(expected):
 
 
 @that_with_context(prepare_stdout)
-def test_output_black_foreground():
+def test_output_black_foreground(context):
     "STDOUT filter output: black foreground"
 
     couleur.proxy(sys.stdout).enable()
@@ -49,7 +49,7 @@ def test_output_black_foreground():
 
 
 @that_with_context(prepare_stdout)
-def test_output_black_on_white_foreground():
+def test_output_black_on_white_foreground(context):
     "STDOUT filter output: black foreground on white background"
 
     couleur.proxy(sys.stdout).enable()
@@ -61,7 +61,7 @@ def test_output_black_on_white_foreground():
 
 
 @that_with_context(prepare_stdout)
-def test_output_green_foreground():
+def test_output_green_foreground(context):
     "STDOUT filter output: green foreground"
 
     couleur.proxy(sys.stdout).enable()
@@ -73,7 +73,7 @@ def test_output_green_foreground():
 
 
 @that_with_context(prepare_stdout)
-def test_output_green_and_red_on_white_foreground():
+def test_output_green_and_red_on_white_foreground(context):
     "STDOUT filter output: green foreground and white on red background"
 
     couleur.proxy(sys.stdout).enable()
@@ -85,7 +85,7 @@ def test_output_green_and_red_on_white_foreground():
 
 
 @that_with_context(prepare_stdout)
-def test_output_stdout_ignoring_output():
+def test_output_stdout_ignoring_output(context):
     "STDOUT filter output: green foreground and white on red background"
 
     couleur.proxy(sys.stdout).enable()
@@ -111,7 +111,7 @@ def test_integration_with_stdout():
 
 
 @that_with_context(prepare_stdout)
-def test_output_different_delimiters():
+def test_output_different_delimiters(context):
     "using square brackets as delimiters should work"
 
     couleur.proxy(sys.stdout, delimiter=couleur.delimiters.SQUARE_BRACKETS).enable()
@@ -123,7 +123,7 @@ def test_output_different_delimiters():
 
 
 @that_with_context(prepare_stdout)
-def test_output_stdout_ignoring_output_square_brackets():
+def test_output_stdout_ignoring_output_square_brackets(context):
     "STDOUT filter output: ignoring output"
 
     couleur.proxy(sys.stdout, delimiter=couleur.delimiters.SQUARE_BRACKETS).enable()
